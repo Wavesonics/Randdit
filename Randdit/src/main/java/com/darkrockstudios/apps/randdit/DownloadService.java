@@ -1,19 +1,27 @@
 package com.darkrockstudios.apps.randdit;
 
 import android.app.DownloadManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.IBinder;
-import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
+import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -33,11 +41,13 @@ public class DownloadService extends Service
 
 	private static class Download
 	{
+		final Uri     m_uri;
 		final long    m_downloadId;
 		final boolean m_setWallpaper;
 
-		public Download( final long downloadId, final boolean setWallpaper )
+		public Download( final Uri uri, final long downloadId, final boolean setWallpaper )
 		{
+			m_uri = uri;
 			m_downloadId = downloadId;
 			m_setWallpaper = setWallpaper;
 		}
@@ -45,7 +55,8 @@ public class DownloadService extends Service
 
 	private Map<Long, Download> m_downloads;
 
-	private DownloadReceiver m_downloadReceiver;
+	private DownloadReceiver    m_downloadReceiver;
+	private NotificationManager m_notificationManager;
 
 	private void registerReceiver()
 	{
@@ -68,6 +79,8 @@ public class DownloadService extends Service
 	{
 		super.onCreate();
 
+		m_notificationManager = (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
+
 		m_downloads = new HashMap<>();
 
 		registerReceiver();
@@ -88,7 +101,7 @@ public class DownloadService extends Service
 			DownloadManager.Request request = new DownloadManager.Request( uri );
 			long downloadId = downloadManager.enqueue( request );
 
-			Download download = new Download( downloadId, setWallpaper );
+			Download download = new Download( uri, downloadId, setWallpaper );
 			m_downloads.put( downloadId, download );
 		}
 
@@ -105,6 +118,11 @@ public class DownloadService extends Service
 
 	private class DownloadReceiver extends BroadcastReceiver
 	{
+		private final boolean IS_JB_OR_LATER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+
+		private static final int ICON_SIZE    = 128;
+		private static final int PICTURE_SIZE = 256;
+
 		@Override
 		public void onReceive( final Context context, final Intent intent )
 		{
@@ -113,6 +131,8 @@ public class DownloadService extends Service
 			{
 				long downloadId = intent.getLongExtra( DownloadManager.EXTRA_DOWNLOAD_ID, 0 );
 
+				DownloadManager downloadManager = (DownloadManager) getSystemService( DOWNLOAD_SERVICE );
+
 				final Download download = m_downloads.get( downloadId );
 				if( download != null )
 				{
@@ -120,27 +140,43 @@ public class DownloadService extends Service
 
 					if( !download.m_setWallpaper )
 					{
-						Toast.makeText( DownloadService.this, getString( R.string.toast_download_finished ),
+						String successText = getString( R.string.toast_download_finished );
+						Toast.makeText( DownloadService.this, successText,
 						                Toast.LENGTH_SHORT ).show();
+
+						displayNotification( download, downloadManager, successText );
 					}
 					else
 					{
 						WallpaperManager wallpaperManager = WallpaperManager.getInstance( context );
-						DownloadManager downloadManager = (DownloadManager) getSystemService( DOWNLOAD_SERVICE );
 
+						InputStream inputStream = null;
 						try
 						{
-							ParcelFileDescriptor pfd = downloadManager.openDownloadedFile( download.m_downloadId );
-							FileDescriptor fd = pfd.getFileDescriptor();
-							InputStream fileStream = new FileInputStream( fd );
-							wallpaperManager.setStream( fileStream );
+							inputStream = getDownloadStream( download, downloadManager );
+							wallpaperManager.setStream( inputStream );
 
-							Toast.makeText( DownloadService.this, getString( R.string.toast_wallpaper_success ),
+							String successText = getString( R.string.toast_wallpaper_success );
+							Toast.makeText( DownloadService.this, successText,
 							                Toast.LENGTH_SHORT ).show();
+
+							displayNotification( download, downloadManager, successText );
 						}
 						catch( IOException e )
 						{
 							e.printStackTrace();
+
+							if( inputStream != null )
+							{
+								try
+								{
+									inputStream.close();
+								}
+								catch( IOException e1 )
+								{
+									e1.printStackTrace();
+								}
+							}
 
 							Toast.makeText( DownloadService.this, getString( R.string.toast_wallpaper_failed ),
 							                Toast.LENGTH_SHORT ).show();
@@ -148,6 +184,140 @@ public class DownloadService extends Service
 					}
 				}
 			}
+		}
+
+		private void displayNotification( final Download download, final DownloadManager downloadManager, final String title )
+		{
+			NotificationCompat.Builder builder = new NotificationCompat.Builder( DownloadService.this );
+			builder.setSmallIcon( R.drawable.stat_downloaded );
+			builder.setContentTitle( title );
+			builder.setAutoCancel( true );
+
+			NotificationCompat.BigPictureStyle style = new NotificationCompat.BigPictureStyle();
+			InputStream inputStream = null;
+			try
+			{
+				final Bitmap icon;
+				if( IS_JB_OR_LATER )
+				{
+					icon = BitmapFactory.decodeResource( DownloadService.this.getResources(), R.drawable.ic_launcher );
+				}
+				else
+				{
+					inputStream = getDownloadStream( download, downloadManager );
+					icon = getScaledBitmap( inputStream, ICON_SIZE );
+					inputStream.close();
+				}
+
+				if( icon != null )
+				{
+					builder.setLargeIcon( icon );
+				}
+
+				if( IS_JB_OR_LATER )
+				{
+					inputStream = getDownloadStream( download, downloadManager );
+					Bitmap bigPicture = getScaledBitmap( inputStream, PICTURE_SIZE );
+					if( bigPicture != null )
+					{
+						style.bigPicture( bigPicture );
+					}
+				}
+			}
+			catch( IOException e )
+			{
+				e.printStackTrace();
+			}
+			finally
+			{
+				if( inputStream != null )
+				{
+					try
+					{
+						inputStream.close();
+					}
+					catch( IOException e )
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+
+			builder.setStyle( style );
+
+			// This is some crappy transformation required for other apps who receive the intent
+			// to be able to open the URI
+			Uri downloadUri = downloadManager.getUriForDownloadedFile( download.m_downloadId );
+			String path = getRealPathFromURI( downloadUri );
+			Uri pathUri = Uri.parse( path );
+			Uri contentUri = Uri.parse("file://" + pathUri.getPath());
+
+			String mimeType = downloadManager.getMimeTypeForDownloadedFile( download.m_downloadId );
+
+			Intent contentIntent = new Intent( android.content.Intent.ACTION_VIEW );
+			contentIntent.setDataAndType( contentUri, mimeType );
+			PendingIntent pendingIntent = PendingIntent.getActivity( DownloadService.this, 0, contentIntent, 0 );
+			builder.setContentIntent( pendingIntent );
+
+			Notification notification = builder.build();
+			m_notificationManager.notify( (int) download.m_downloadId, notification );
+		}
+
+		public String getRealPathFromURI(Uri contentUri)
+		{
+			// can post image
+			String [] proj={ MediaStore.Images.Media.DATA};
+			Cursor cursor = getContentResolver().query(
+					                      contentUri,
+			                              proj, // Which columns to return
+			                              null,       // WHERE clause; which rows to return (all rows)
+			                              null,       // WHERE clause selection arguments (none)
+			                              null); // Order-by clause (ascending by name)
+			int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+			cursor.moveToFirst();
+
+			return cursor.getString(column_index);
+		}
+
+		private Bitmap getScaledBitmap( final InputStream inputStream, final int maxSize ) throws IOException
+		{
+			Bitmap bitmap = BitmapFactory.decodeStream( inputStream );
+			if( bitmap != null )
+			{
+				int width = bitmap.getWidth();
+				int height = bitmap.getHeight();
+
+				final double scale;
+				if( width > height )
+				{
+					scale = (double) maxSize / (double) width;
+				}
+				else
+				{
+					scale = (double) maxSize / (double) height;
+				}
+
+				width = (int) ((double) width * scale);
+				height = (int) ((double) height * scale);
+
+				bitmap = Bitmap.createScaledBitmap( bitmap, width, height, false );
+			}
+
+			return bitmap;
+		}
+
+		private InputStream getDownloadStream( final Download download, final DownloadManager downloadManager ) throws FileNotFoundException
+		{
+			InputStream inputStream = null;
+
+			Uri uri = downloadManager.getUriForDownloadedFile( download.m_downloadId );
+			if( uri != null )
+			{
+				ContentResolver cr = getContentResolver();
+				inputStream = cr.openInputStream( uri );
+			}
+
+			return inputStream;
 		}
 	}
 }

@@ -31,6 +31,7 @@ public class PostFragment extends Fragment implements View.OnClickListener
 
 	private Post   m_post;
 	private Button m_nextPostButton;
+	private UrlImageView m_imageView;
 
 	private ShareActionProvider m_shareActionProvider;
 	private AlertDialog         m_titleDialog;
@@ -52,6 +53,7 @@ public class PostFragment extends Fragment implements View.OnClickListener
 		super.onCreate( savedInstanceState );
 
 		setHasOptionsMenu( true );
+		setRetainInstance( true );
 
 		Bundle args = getArguments();
 		if( args != null )
@@ -67,9 +69,9 @@ public class PostFragment extends Fragment implements View.OnClickListener
 
 		Uri uri = Uri.parse( m_post.url );
 
-		UrlImageView image = (UrlImageView) view.findViewById( R.id.POST_imageview );
-		image.setErrorImage( R.drawable.image_error );
-		image.loadImage( uri, RandditApplication.getImageCache() );
+		m_imageView = (UrlImageView) view.findViewById( R.id.POST_imageview );
+		m_imageView.setErrorImage( R.drawable.image_error );
+		m_imageView.loadImage( uri, RandditApplication.getImageCache() );
 
 		final TextView text = (TextView) view.findViewById( R.id.POST_title );
 		text.setText( m_post.title );
