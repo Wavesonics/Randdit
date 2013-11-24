@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/pref_general_title"
+        android:key="pref_key_storage_settings">
+        <CheckBoxPreference
+            android:key="pref_key_keep_screen_on"
+            android:summary="@string/pref_summary_keep_screen_on"
+            android:title="@string/pref_title_keep_screen_on"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -1,0 +1,40 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.6.+'
+    }
+}
+apply plugin: 'android'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.android.support:support-v13:+'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile('de.keyboardsurfer.android.widget:crouton:1.8.1') {
+        exclude module: 'support-v4'
+        compile 'com.android.support:support-v4:18.0.0'
+    }
+    compile 'com.github.chrisbanes.photoview:library:1.2.2'
+    compile files('libs/volley.jar')
+    compile files('libs/gif-drawable.jar')
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion '19.0.0'
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 19
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}
