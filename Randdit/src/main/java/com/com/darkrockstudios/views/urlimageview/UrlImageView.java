@@ -64,9 +64,9 @@ public class UrlImageView extends FrameLayout
 	private int m_errorImageId;
 
 	private static final int DEFAULT_MAX_SIZE = 2048;
-	private boolean m_maxDimensionsSet;
-	private int m_maxBitmapWidth  = DEFAULT_MAX_SIZE;
-	private int m_maxBitmapHeight = DEFAULT_MAX_SIZE;
+	private static boolean m_maxDimensionsSet;
+	private static int m_maxBitmapWidth  = DEFAULT_MAX_SIZE;
+	private static int m_maxBitmapHeight = DEFAULT_MAX_SIZE;
 
 	private void setupViews( final Context context, final AttributeSet attrs, final int defStyle )
 	{

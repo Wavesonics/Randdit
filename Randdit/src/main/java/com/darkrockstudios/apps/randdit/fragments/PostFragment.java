@@ -20,6 +20,8 @@ import com.com.darkrockstudios.views.urlimageview.UrlImageView;
 import com.darkrockstudios.apps.randdit.DownloadService;
 import com.darkrockstudios.apps.randdit.R;
 import com.darkrockstudios.apps.randdit.RandditApplication;
+import com.darkrockstudios.apps.randdit.misc.Analytics;
+import com.darkrockstudios.apps.randdit.misc.NavDrawerAdapter;
 import com.darkrockstudios.apps.randdit.misc.Post;
 
 /**
@@ -28,20 +30,23 @@ import com.darkrockstudios.apps.randdit.misc.Post;
 public class PostFragment extends Fragment implements View.OnClickListener
 {
 	private static final String ARG_POST = PostFragment.class.getName() + ".POST";
+	private static final String ARG_CATEGORY = PostFragment.class.getName() + ".CATEGORY";
 
 	private Post   m_post;
+	private NavDrawerAdapter.NavItem m_category;
 	private Button m_nextPostButton;
 	private UrlImageView m_imageView;
 
 	private ShareActionProvider m_shareActionProvider;
 	private AlertDialog         m_titleDialog;
 
-	public static PostFragment newInstance( final Post post )
+	public static PostFragment newInstance( final Post post, final NavDrawerAdapter.NavItem category )
 	{
 		PostFragment fragment = new PostFragment();
 
 		Bundle args = new Bundle();
 		args.putSerializable( ARG_POST, post );
+		args.putSerializable( ARG_CATEGORY, category );
 		fragment.setArguments( args );
 
 		return fragment;
@@ -59,6 +64,7 @@ public class PostFragment extends Fragment implements View.OnClickListener
 		if( args != null )
 		{
 			m_post = (Post) args.getSerializable( ARG_POST );
+			m_category = (NavDrawerAdapter.NavItem) args.getSerializable( ARG_CATEGORY );
 		}
 	}
 
@@ -118,6 +124,8 @@ public class PostFragment extends Fragment implements View.OnClickListener
 						intent.setData( uri );
 						activity.startService( intent );
 					}
+
+					Analytics.trackDownload( activity, m_category );
 				}
 				handled = true;
 			}
@@ -134,6 +142,8 @@ public class PostFragment extends Fragment implements View.OnClickListener
 						intent.putExtra( DownloadService.EXTRA_SET_WALLPAPER, true );
 						activity.startService( intent );
 					}
+
+					Analytics.trackWallpaper( activity, m_category );
 				}
 				handled = true;
 			}

@@ -22,6 +22,7 @@ dependencies {
     compile 'com.github.chrisbanes.photoview:library:1.2.2'
     compile files('libs/volley.jar')
     compile files('libs/gif-drawable.jar')
+    compile files('libs/libGoogleAnalyticsServices.jar')
 }
 
 android {

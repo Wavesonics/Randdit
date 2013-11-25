@@ -25,8 +25,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.darkrockstudios.apps.randdit.fragments.IntroFragment;
 import com.darkrockstudios.apps.randdit.fragments.PostFragment;
+import com.darkrockstudios.apps.randdit.misc.Analytics;
 import com.darkrockstudios.apps.randdit.misc.NavDrawerAdapter;
 import com.darkrockstudios.apps.randdit.misc.Post;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -52,7 +54,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	private NavDrawerAdapter m_navDrawerAdapter;
 	private LinkedList<Post> m_posts;
 
-	private NavDrawerAdapter.NavItem m_currentNavItem;
+	private NavDrawerAdapter.NavItem m_currentCategory;
 
 	private boolean m_isActive;
 
@@ -91,7 +93,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 			if( savedInstanceState.containsKey( SAVE_NAV_ITEM ) )
 			{
-				m_currentNavItem = (NavDrawerAdapter.NavItem) savedInstanceState.getSerializable( SAVE_NAV_ITEM );
+				m_currentCategory = (NavDrawerAdapter.NavItem) savedInstanceState.getSerializable( SAVE_NAV_ITEM );
 				setTitle();
 			}
 		}
@@ -116,7 +118,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		super.onSaveInstanceState( outState );
 
 		outState.putSerializable( SAVE_POSTS, m_posts );
-		outState.putSerializable( SAVE_NAV_ITEM, m_currentNavItem );
+		outState.putSerializable( SAVE_NAV_ITEM, m_currentCategory );
 	}
 
 	@Override
@@ -159,6 +161,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 				Intent intent = new Intent( this, SettingsActivity.class );
 				startActivity( intent );
+
+				Analytics.trackSettings( this );
+			}
+			else if( id == R.id.menu_item_share )
+			{
+				Analytics.trackShare( this, m_currentCategory );
+				handled = super.onOptionsItemSelected( item );
 			}
 			else
 			{
@@ -166,6 +175,22 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			}
 		}
 		return handled;
+	}
+
+	@Override
+	public void onStart()
+	{
+		super.onStart();
+
+		EasyTracker.getInstance( this ).activityStart( this );
+	}
+
+	@Override
+	public void onStop()
+	{
+		super.onStop();
+
+		EasyTracker.getInstance( this ).activityStop( this );
 	}
 
 	@Override
@@ -199,7 +224,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		setProgressBarIndeterminateVisibility( true );
 		setNextImageButtonEnabled( false );
 
-		final String url = "http://randdit.com/" + NavDrawerAdapter.getId( m_currentNavItem ) + "/?api";
+		final String url = "http://randdit.com/" + NavDrawerAdapter.getId( m_currentCategory ) + "/?api";
 		RandditPostHandler responseHandler = new RandditPostHandler();
 		JsonObjectRequest jsObjRequest =
 				new JsonObjectRequest( url, null, responseHandler, responseHandler );
@@ -224,6 +249,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 	public void onShowImageClicked( View view )
 	{
+		Analytics.trackNextImageClick( this, m_currentCategory );
 		showPost();
 	}
 
@@ -236,7 +262,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			{
 				FragmentManager fragmentManager = getFragmentManager();
 
-				PostFragment fragment = PostFragment.newInstance( post );
+				PostFragment fragment = PostFragment.newInstance( post, m_currentCategory );
 				fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
 			}
 		}
@@ -249,10 +275,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	@Override
 	public void onItemClick( AdapterView<?> parent, View view, int position, long id )
 	{
-		m_currentNavItem = m_navDrawerAdapter.getItem( position );
+		m_currentCategory = m_navDrawerAdapter.getItem( position );
 		m_posts.clear();
 		requestPosts();
 		m_drawerLayout.closeDrawer( m_navDrawerView );
+
+		Analytics.trackCategoryChange( this, m_currentCategory );
 	}
 
 	public void clearTitle()
@@ -266,9 +294,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		String appName = getString( R.string.app_name );
 
 		final String newTitle;
-		if( m_currentNavItem != null )
+		if( m_currentCategory != null )
 		{
-			String sectionTitle = NavDrawerAdapter.getId( m_currentNavItem );
+			String sectionTitle = NavDrawerAdapter.getId( m_currentCategory );
 			newTitle = appName + " - " + sectionTitle;
 		}
 		else
