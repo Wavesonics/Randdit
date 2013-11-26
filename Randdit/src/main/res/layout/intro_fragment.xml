@@ -1,39 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_height="match_parent"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:orientation="vertical">
 
-    <LinearLayout
+    <FrameLayout
         android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:padding="@dimen/intro_padding"
-        android:layout_margin="@dimen/intro_margin"
-        android:background="@color/intro_background">
+        android:layout_weight="1">
 
-        <TextView
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/intro_1"
-            />
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="@dimen/intro_padding"
+            android:layout_margin="@dimen/intro_margin"
+            android:background="@color/intro_background">
 
-        <TextView
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/intro_1"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/intro_2"
+                android:layout_marginTop="@dimen/text_spacing"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/intro_3"
+                android:layout_marginTop="@dimen/text_spacing"/>
+        </LinearLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary"
+        android:layout_gravity="bottom"
+        android:padding="@dimen/button_container_padding">
+
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/intro_2"
-            android:layout_marginTop="@dimen/text_spacing"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/intro_3"
-            android:layout_marginTop="@dimen/text_spacing"/>
-    </LinearLayout>
-</FrameLayout>
+            android:text="@string/load_first_image_button"
+            android:id="@+id/POST_load_image_button"
+            android:layout_gravity="center"
+            android:onClick="onShowImageClicked"/>
+    </FrameLayout>
+</LinearLayout>

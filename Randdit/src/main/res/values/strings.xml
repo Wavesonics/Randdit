@@ -3,6 +3,7 @@
     <string name="app_name">Randdit</string>
     <string name="drawer_open">open drawer</string>
     <string name="drawer_close">close drawer</string>
+    <string name="load_first_image_button">Lets get started!</string>
     <string name="load_image_button">Show me another image!</string>
     <string name="action_settings">Settings</string>
     <string name="title_settings">Settings</string>

@@ -104,13 +104,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			FragmentManager fragmentManager = getFragmentManager();
 			fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
 		}
-
-		/*
-		if( m_posts.size() == 0 )
-		{
-			requestPosts();
-		}
-		*/
 	}
 
 	protected void onSaveInstanceState( Bundle outState )
@@ -249,6 +242,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 	public void onShowImageClicked( View view )
 	{
+		if( m_currentCategory == null )
+		{
+			m_currentCategory = NavDrawerAdapter.NavItem.all;
+			setTitle();
+		}
+
 		Analytics.trackNextImageClick( this, m_currentCategory );
 		showPost();
 	}

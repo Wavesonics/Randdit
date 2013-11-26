@@ -16,7 +16,8 @@ import android.widget.Button;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
-import com.com.darkrockstudios.views.urlimageview.UrlImageView;
+import com.com.darkrockstudios.views.uriimageview.UriImageHandler;
+import com.com.darkrockstudios.views.uriimageview.UriImageView;
 import com.darkrockstudios.apps.randdit.DownloadService;
 import com.darkrockstudios.apps.randdit.R;
 import com.darkrockstudios.apps.randdit.RandditApplication;
@@ -29,13 +30,15 @@ import com.darkrockstudios.apps.randdit.misc.Post;
  */
 public class PostFragment extends Fragment implements View.OnClickListener
 {
+	private static final String TAG = PostFragment.class.getSimpleName();
+
 	private static final String ARG_POST = PostFragment.class.getName() + ".POST";
 	private static final String ARG_CATEGORY = PostFragment.class.getName() + ".CATEGORY";
 
 	private Post   m_post;
 	private NavDrawerAdapter.NavItem m_category;
 	private Button m_nextPostButton;
-	private UrlImageView m_imageView;
+	private UriImageHandler m_imageHandler;
 
 	private ShareActionProvider m_shareActionProvider;
 	private AlertDialog         m_titleDialog;
@@ -66,6 +69,32 @@ public class PostFragment extends Fragment implements View.OnClickListener
 			m_post = (Post) args.getSerializable( ARG_POST );
 			m_category = (NavDrawerAdapter.NavItem) args.getSerializable( ARG_CATEGORY );
 		}
+
+		m_imageHandler = new UriImageHandler();
+	}
+
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+
+		m_imageHandler.onResume( (UriImageView) getView().findViewById( R.id.POST_imageview ) );
+	}
+
+	@Override
+	public void onPause()
+	{
+		super.onPause();
+
+		m_imageHandler.onPause();
+	}
+
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+
+		m_imageHandler.cancelDownload();
 	}
 
 	@Override
@@ -75,9 +104,9 @@ public class PostFragment extends Fragment implements View.OnClickListener
 
 		Uri uri = Uri.parse( m_post.url );
 
-		m_imageView = (UrlImageView) view.findViewById( R.id.POST_imageview );
+		UriImageView m_imageView = (UriImageView) view.findViewById( R.id.POST_imageview );
 		m_imageView.setErrorImage( R.drawable.image_error );
-		m_imageView.loadImage( uri, RandditApplication.getImageCache() );
+		m_imageHandler.loadImage( uri, m_imageView, RandditApplication.getImageCache() );
 
 		final TextView text = (TextView) view.findViewById( R.id.POST_title );
 		text.setText( m_post.title );
