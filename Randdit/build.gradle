@@ -48,8 +48,8 @@ android {
     buildTypes {
         release {
             debuggable false
-            signingConfig signingConfigs.release
             zipAlign true
+            signingConfig signingConfigs.release
         }
     }
 
@@ -57,10 +57,12 @@ android {
     if (project.hasProperty('storeFile') &&
             project.hasProperty('storePassword') &&
             project.hasProperty('keyPassword')) {
+        println 'local.properties all set'
         android.signingConfigs.release.storeFile = file(storeFile)
         android.signingConfigs.release.storePassword = storePassword
         android.signingConfigs.release.keyPassword = keyPassword
     } else {
+        println 'local.properties not correctly set'
         buildTypes.release.signingConfig = null
     }
 }
