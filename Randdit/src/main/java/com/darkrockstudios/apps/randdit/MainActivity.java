@@ -6,6 +6,7 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -27,6 +28,7 @@ import com.darkrockstudios.apps.randdit.fragments.IntroFragment;
 import com.darkrockstudios.apps.randdit.fragments.PostFragment;
 import com.darkrockstudios.apps.randdit.misc.Analytics;
 import com.darkrockstudios.apps.randdit.misc.NavDrawerAdapter;
+import com.darkrockstudios.apps.randdit.misc.NextButtonEnabler;
 import com.darkrockstudios.apps.randdit.misc.Post;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
@@ -60,7 +62,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	private boolean m_isActive;
 
 	@Override
-	protected void onCreate( Bundle savedInstanceState )
+	protected void onCreate( final Bundle savedInstanceState )
 	{
 		super.onCreate( savedInstanceState );
 		requestWindowFeature( Window.FEATURE_INDETERMINATE_PROGRESS );
@@ -91,30 +93,79 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 		m_posts = new LinkedList<>();
 
-		if( savedInstanceState != null )
+		final Post post = getPostFromIntent();
+		if( post == null )
 		{
-			if( savedInstanceState.containsKey( SAVE_POSTS ) )
+			if( savedInstanceState != null )
 			{
-				List<Post> postList = (List<Post>) savedInstanceState.getSerializable( SAVE_POSTS );
-				m_posts.addAll( postList );
-			}
+				if( savedInstanceState.containsKey( SAVE_POSTS ) )
+				{
+					List<Post> postList = (List<Post>) savedInstanceState.getSerializable( SAVE_POSTS );
+					m_posts.addAll( postList );
+				}
 
-			if( savedInstanceState.containsKey( SAVE_NAV_ITEM ) )
+				if( savedInstanceState.containsKey( SAVE_NAV_ITEM ) )
+				{
+					m_currentCategory = (NavDrawerAdapter.NavItem) savedInstanceState.getSerializable( SAVE_NAV_ITEM );
+					setTitle();
+				}
+			}
+			else
 			{
-				m_currentCategory = (NavDrawerAdapter.NavItem) savedInstanceState.getSerializable( SAVE_NAV_ITEM );
-				setTitle();
+				IntroFragment fragment = IntroFragment.newInstance();
+
+				FragmentManager fragmentManager = getFragmentManager();
+				fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
 			}
 		}
 		else
 		{
-			IntroFragment fragment = IntroFragment.newInstance();
-
 			FragmentManager fragmentManager = getFragmentManager();
+
+			PostFragment fragment = PostFragment.newInstance( post, m_currentCategory );
 			fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
 		}
 	}
 
-	protected void onSaveInstanceState( Bundle outState )
+	private Post getPostFromIntent()
+	{
+		Post post = null;
+
+		Intent intent = getIntent();
+		if( intent != null && Intent.ACTION_VIEW.equals( intent.getAction() ) && intent.getData() != null )
+		{
+			Uri uri = intent.getData();
+			List<String> pathSegments = uri.getPathSegments();
+			if( pathSegments != null && pathSegments.size() > 1 )
+			{
+				post = new Post();
+				post.id = pathSegments.get( 1 );
+
+				if( pathSegments.size() > 2 )
+				{
+					post.title = pathSegments.get( 2 );
+				}
+				else
+				{
+					post.title = "";
+				}
+
+				// We have a post at the point, so set our category
+				try
+				{
+					m_currentCategory = NavDrawerAdapter.NavItem.valueOf( pathSegments.get( 0 ) );
+				}
+				catch( IllegalArgumentException e )
+				{
+					m_currentCategory = NavDrawerAdapter.NavItem.all;
+				}
+			}
+		}
+
+		return post;
+	}
+
+	protected void onSaveInstanceState( final Bundle outState )
 	{
 		super.onSaveInstanceState( outState );
 
@@ -123,7 +174,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	}
 
 	@Override
-	protected void onPostCreate( Bundle savedInstanceState )
+	protected void onPostCreate( final Bundle savedInstanceState )
 	{
 		super.onPostCreate( savedInstanceState );
 		// Sync the toggle state after onRestoreInstanceState has occurred.
@@ -131,14 +182,14 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	}
 
 	@Override
-	public void onConfigurationChanged( Configuration newConfig )
+	public void onConfigurationChanged( final Configuration newConfig )
 	{
 		super.onConfigurationChanged( newConfig );
 		m_drawerToggle.onConfigurationChanged( newConfig );
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu( Menu menu )
+	public boolean onCreateOptionsMenu( final Menu menu )
 	{
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate( R.menu.main, menu );
@@ -146,7 +197,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	}
 
 	@Override
-	public boolean onOptionsItemSelected( MenuItem item )
+	public boolean onOptionsItemSelected( final MenuItem item )
 	{
 		final boolean handled;
 		if( m_drawerToggle.onOptionsItemSelected( item ) )
@@ -234,21 +285,21 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		requestQueue.add( jsObjRequest );
 	}
 
-	private void setNextImageButtonEnabled( boolean enabled )
+	private void setNextImageButtonEnabled( final boolean enabled )
 	{
 		if( m_isActive )
 		{
 			FragmentManager fragmentManager = getFragmentManager();
 			Fragment fragment = fragmentManager.findFragmentByTag( CONTENT_FRAGMENT_TAG );
-			if( fragment != null && fragment instanceof PostFragment )
+			if( fragment != null && fragment instanceof NextButtonEnabler )
 			{
-				PostFragment postFragment = (PostFragment) fragment;
-				postFragment.setButtonEnabled( enabled );
+				NextButtonEnabler buttonEnabler = (NextButtonEnabler) fragment;
+				buttonEnabler.setNextButtonEnabled( enabled );
 			}
 		}
 	}
 
-	public void onShowImageClicked( View view )
+	public void onShowImageClicked( final View view )
 	{
 		if( m_currentCategory == null )
 		{
@@ -280,7 +331,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	}
 
 	@Override
-	public void onItemClick( AdapterView<?> parent, View view, int position, long id )
+	public void onItemClick( final AdapterView<?> parent, final View view, final int position, final long id )
 	{
 		m_currentCategory = m_navDrawerAdapter.getItem( position );
 		m_posts.clear();
@@ -322,7 +373,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		}
 
 		@Override
-		public void onResponse( JSONObject jsonObject )
+		public void onResponse( final JSONObject jsonObject )
 		{
 			Log.d( TAG, "Posts received." );
 
@@ -355,7 +406,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		}
 
 		@Override
-		public void onErrorResponse( VolleyError volleyError )
+		public void onErrorResponse( final VolleyError volleyError )
 		{
 			Log.d( TAG, "Failed to retrieve posts." );
 			Log.d( TAG, volleyError.toString() );
@@ -367,12 +418,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 	private class DrawerToggle extends ActionBarDrawerToggle
 	{
-		public DrawerToggle( Activity activity, DrawerLayout drawerLayout, int drawerImageRes, int openDrawerContentDescRes, int closeDrawerContentDescRes )
+		public DrawerToggle( final Activity activity, final DrawerLayout drawerLayout, final int drawerImageRes, final int openDrawerContentDescRes, final int closeDrawerContentDescRes )
 		{
 			super( activity, drawerLayout, drawerImageRes, openDrawerContentDescRes, closeDrawerContentDescRes );
 		}
 
-		public void onDrawerClosed( View view )
+		public void onDrawerClosed( final View view )
 		{
 			setTitle();
 		}
@@ -380,7 +431,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		/**
 		 * Called when a drawer has settled in a completely open state.
 		 */
-		public void onDrawerOpened( View drawerView )
+		public void onDrawerOpened( final View drawerView )
 		{
 			clearTitle();
 		}
