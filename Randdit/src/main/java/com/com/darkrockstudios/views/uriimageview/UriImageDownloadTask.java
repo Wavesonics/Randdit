@@ -1,5 +1,6 @@
 package com.com.darkrockstudios.views.uriimageview;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import com.darkrockstudios.apps.randdit.R;
 
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -104,13 +107,41 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 
 			publishProgress( 1, 100 );
 			Map<String, List<String>> headers = urlConnection.getHeaderFields();
-			mimeTypes = headers.get( CONTENT_TYPE );
+			if( headers != null )
+			{
+				mimeTypes = headers.get( CONTENT_TYPE );
+			}
+			// We must try and guess the Mimetype from the URL if we didn't get headers
+			else
+			{
+				ContentResolver contentResolver = m_context.getContentResolver();
+				MimeTypeMap mime = MimeTypeMap.getSingleton();
+
+				String type = contentResolver.getType( m_uri );
+				if( type != null )
+				{
+					String mimeType = mime.getExtensionFromMimeType( type );
+					if( mimeType != null )
+					{
+						mimeTypes = new ArrayList<>();
+						mimeTypes.add( mimeType );
+					}
+				}
+			}
 
 			final int contentLength;
-			List<String> contentLengths = headers.get( CONTENT_LENGTH );
-			if( contentLengths != null && contentLengths.size() > 0 )
+			if( headers != null )
 			{
-				contentLength = Integer.parseInt( contentLengths.get( 0 ) );
+				List<String> contentLengths = headers.get( CONTENT_LENGTH );
+				if( contentLengths != null && contentLengths.size() > 0 )
+				{
+					contentLength = Integer.parseInt( contentLengths.get( 0 ) );
+				}
+				else
+				{
+					contentLength = 0;
+					publishProgress( 0, 0, -1 );
+				}
 			}
 			else
 			{
@@ -275,13 +306,23 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 	{
 		boolean supported = false;
 
-		for( String supportedMimeType : SUPPORTED_FORMATS )
+		if( mimeTypes != null )
 		{
-			if( findMimeType( supportedMimeType, mimeTypes ) )
+			for( String supportedMimeType : SUPPORTED_FORMATS )
 			{
-				supported = true;
-				break;
+				if( findMimeType( supportedMimeType, mimeTypes ) )
+				{
+					supported = true;
+					break;
+				}
 			}
+		}
+		// This is the end of the line. Everything has failed. We have no fucking idea what mime type this thing is.
+		// The server didn't send headers, and we weren't able to deduce the type from the URL. Give up and throw
+		// caution to the wind! Lets mark it as supported and try to decode this bitch!
+		else
+		{
+			supported = true;
 		}
 
 		return supported;
