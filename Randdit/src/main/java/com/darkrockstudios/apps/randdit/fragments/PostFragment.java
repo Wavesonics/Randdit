@@ -24,6 +24,9 @@ import com.darkrockstudios.apps.randdit.RandditApplication;
 import com.darkrockstudios.apps.randdit.misc.Analytics;
 import com.darkrockstudios.apps.randdit.misc.NavDrawerAdapter;
 import com.darkrockstudios.apps.randdit.misc.Post;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
 
 /**
  * Created by Adam on 11/22/13.
@@ -71,6 +74,10 @@ public class PostFragment extends Fragment implements View.OnClickListener
 		}
 
 		m_imageHandler = new UriImageHandler();
+
+		EasyTracker tracker = EasyTracker.getInstance( getActivity() );
+		tracker.set( Fields.SCREEN_NAME, getClass().getSimpleName() );
+		tracker.send( MapBuilder.createAppView().build() );
 	}
 
 	@Override

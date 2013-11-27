@@ -29,6 +29,7 @@ import com.darkrockstudios.apps.randdit.misc.Analytics;
 import com.darkrockstudios.apps.randdit.misc.NavDrawerAdapter;
 import com.darkrockstudios.apps.randdit.misc.Post;
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -63,6 +64,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	{
 		super.onCreate( savedInstanceState );
 		requestWindowFeature( Window.FEATURE_INDETERMINATE_PROGRESS );
+
+		// Don't report starts during testing
+		if( BuildConfig.DEBUG )
+		{
+			GoogleAnalytics.getInstance( this ).setDryRun( true );
+		}
+
 		setContentView( R.layout.activity_main_simple );
 
 		PreferenceManager.setDefaultValues( this, R.xml.settings, false );
