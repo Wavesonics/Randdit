@@ -19,7 +19,7 @@
     <string name="menu_download">Download</string>
     <string name="menu_wallpaper">Set as wallpaper</string>
 
-    <string name="share_body">%1$s - %2$s - shared from Randdit</string>
+    <string name="share_body">%1$s - %2$s - via Randdit Android</string>
     <string name="toast_download_finished">Download finished</string>
     <string name="toast_download_started">Download started</string>
     <string name="toast_wallpaper_failed">Failed to set wallpaper</string>

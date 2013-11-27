@@ -32,7 +32,7 @@ public class IntroFragment extends Fragment
 	}
 
 	@Override
-	public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState )
+	public View onCreateView( final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState )
 	{
 		View view = inflater.inflate( R.layout.intro_fragment, container, false );
 

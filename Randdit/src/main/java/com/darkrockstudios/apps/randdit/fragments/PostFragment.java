@@ -38,9 +38,9 @@ public class PostFragment extends Fragment implements View.OnClickListener
 	private static final String ARG_POST = PostFragment.class.getName() + ".POST";
 	private static final String ARG_CATEGORY = PostFragment.class.getName() + ".CATEGORY";
 
-	private Post   m_post;
+	private Post            m_post;
 	private NavDrawerAdapter.NavItem m_category;
-	private Button m_nextPostButton;
+	private Button          m_nextPostButton;
 	private UriImageHandler m_imageHandler;
 
 	private ShareActionProvider m_shareActionProvider;
@@ -125,7 +125,7 @@ public class PostFragment extends Fragment implements View.OnClickListener
 	}
 
 	@Override
-	public void onCreateOptionsMenu( Menu menu, MenuInflater inflater )
+	public void onCreateOptionsMenu( final Menu menu, final MenuInflater inflater )
 	{
 		super.onCreateOptionsMenu( menu, inflater );
 
@@ -141,13 +141,13 @@ public class PostFragment extends Fragment implements View.OnClickListener
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
+	public boolean onOptionsItemSelected( final MenuItem item )
 	{
 		final boolean handled;
 
 		Activity activity = getActivity();
 
-		switch (item.getItemId())
+		switch( item.getItemId() )
 		{
 			case R.id.menu_item_download:
 			{
@@ -165,7 +165,7 @@ public class PostFragment extends Fragment implements View.OnClickListener
 				}
 				handled = true;
 			}
-				break;
+			break;
 			case R.id.menu_item_wallpaper:
 			{
 				if( activity != null && isAdded() )
@@ -183,27 +183,37 @@ public class PostFragment extends Fragment implements View.OnClickListener
 				}
 				handled = true;
 			}
-				break;
+			break;
 			default:
-				handled = super.onOptionsItemSelected(item);
+				handled = super.onOptionsItemSelected( item );
 				break;
 		}
 
 		return handled;
 	}
 
-	private Intent createShareIntent( Post post )
+	private String createRandditUrl( final Post post )
+	{
+		String randditBase = "http://randdit.com/";
+		String category = NavDrawerAdapter.getId( m_category );
+
+		String url = randditBase + category + '/' + post.id;
+
+		return url;
+	}
+
+	private Intent createShareIntent( final Post post )
 	{
 		Intent intent = new Intent( Intent.ACTION_SEND );
 		intent.setData( Uri.parse( post.url ) );
-		String shareBody = getString( R.string.share_body, post.title, post.url );
+		String shareBody = getString( R.string.share_body, post.title, createRandditUrl( post ) );
 		intent.putExtra( Intent.EXTRA_TEXT, shareBody );
 		intent.setType( "image/*" );
 
 		return intent;
 	}
 
-	private void setShareIntent( Intent shareIntent )
+	private void setShareIntent( final Intent shareIntent )
 	{
 		if( m_shareActionProvider != null )
 		{
