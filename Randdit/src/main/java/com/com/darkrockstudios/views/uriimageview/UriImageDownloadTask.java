@@ -14,7 +14,6 @@ import android.webkit.MimeTypeMap;
 import com.darkrockstudios.apps.randdit.R;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -208,10 +207,9 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 				if( findMimeType( GIF_MIME_TYPE, mimeTypes ) )
 				{
 					byte[] bits = imageStream.toByteArray();
-					ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( bits );
 					try
 					{
-						GifDrawable gifDrawable = new GifDrawable( byteArrayInputStream );
+						GifDrawable gifDrawable = new GifDrawable( bits );
 						if( m_cache != null )
 						{
 							m_cache.putDrawable( m_uri, gifDrawable );
