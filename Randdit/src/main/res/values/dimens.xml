@@ -10,4 +10,6 @@
     <dimen name="intro_margin">16dp</dimen>
     <dimen name="intro_padding">16dp</dimen>
 
+    <dimen name="post_bar">55sp</dimen>
+
 </resources>

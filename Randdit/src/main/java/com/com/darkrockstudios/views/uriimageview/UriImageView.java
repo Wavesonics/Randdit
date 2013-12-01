@@ -2,6 +2,7 @@ package com.com.darkrockstudios.views.uriimageview;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.AttributeSet;
@@ -11,11 +12,12 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import uk.co.senab.photoview.PhotoView;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
  * Created by Adam on 11/22/13.
  */
-public class UriImageView extends FrameLayout
+public class UriImageView extends FrameLayout implements PhotoViewAttacher.OnMatrixChangedListener
 {
 	private static final String TAG = UriImageView.class.getSimpleName();
 
@@ -33,12 +35,28 @@ public class UriImageView extends FrameLayout
 	private static int m_maxBitmapWidth  = DEFAULT_MAX_SIZE;
 	private static int m_maxBitmapHeight = DEFAULT_MAX_SIZE;
 
+	private ImageZoomListener m_zoomListener;
+	private boolean           m_zooming;
+
+	public static interface ImageZoomListener
+	{
+		public void beganZooming( UriImageView uriImageView );
+
+		public void endedZooming( UriImageView uriImageView );
+	}
+
 	private void setupViews( final Context context, final AttributeSet attrs, final int defStyle )
 	{
 		m_maxDimensionsSet = false;
 
+		setClipToPadding( false );
+		setClipChildren( false );
+
 		m_imageView = new PhotoView( context );
+		m_imageView.setAdjustViewBounds( true );
 		addView( m_imageView );
+
+		m_imageView.setOnMatrixChangeListener( this );
 
 		m_progressBar = new ProgressBar( context, null, android.R.attr.progressBarStyleHorizontal );
 		m_progressBar.setIndeterminate( false );
@@ -62,6 +80,11 @@ public class UriImageView extends FrameLayout
 	{
 		super( context );
 		setupViews( context, null, 0 );
+	}
+
+	public void setZoomListener( ImageZoomListener zoomListener )
+	{
+		m_zoomListener = zoomListener;
 	}
 
 	public void setErrorImage( final int errorImageId )
@@ -166,5 +189,24 @@ public class UriImageView extends FrameLayout
 		}
 
 		return downloadTask;
+	}
+
+	@Override
+	public void onMatrixChanged( RectF rectF )
+	{
+		if( m_zoomListener != null )
+		{
+			final float scale = m_imageView.getScale();
+			if( !m_zooming && scale > 1.0f )
+			{
+				m_zooming = true;
+				m_zoomListener.beganZooming( this );
+			}
+			else if( m_zooming && scale <= 1.0f )
+			{
+				m_zooming = false;
+				m_zoomListener.endedZooming( this );
+			}
+		}
 	}
 }

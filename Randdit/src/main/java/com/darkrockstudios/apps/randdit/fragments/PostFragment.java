@@ -1,8 +1,10 @@
 package com.darkrockstudios.apps.randdit.fragments;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
@@ -32,7 +35,7 @@ import com.google.analytics.tracking.android.MapBuilder;
 /**
  * Created by Adam on 11/22/13.
  */
-public class PostFragment extends Fragment implements View.OnClickListener, NextButtonEnabler
+public class PostFragment extends Fragment implements View.OnClickListener, NextButtonEnabler, UriImageView.ImageZoomListener
 {
 	private static final String TAG = PostFragment.class.getSimpleName();
 
@@ -41,6 +44,9 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 
 	private Post            m_post;
 	private NavDrawerAdapter.NavItem m_category;
+	private TextView        m_titleView;
+	private View            m_toolBarView;
+	private UriImageView    m_imageView;
 	private Button          m_nextPostButton;
 	private UriImageHandler m_imageHandler;
 
@@ -112,13 +118,16 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 
 		Uri uri = Uri.parse( m_post.url );
 
-		UriImageView m_imageView = (UriImageView) view.findViewById( R.id.POST_imageview );
+		m_imageView = (UriImageView) view.findViewById( R.id.POST_imageview );
 		m_imageView.setErrorImage( R.drawable.image_error );
 		m_imageHandler.loadImage( uri, m_imageView, RandditApplication.getImageCache() );
+		m_imageView.setZoomListener( this );
 
-		final TextView text = (TextView) view.findViewById( R.id.POST_title );
-		text.setText( m_post.title );
-		text.setOnClickListener( this );
+		m_toolBarView = view.findViewById( R.id.POST_tool_bar );
+
+		m_titleView = (TextView) view.findViewById( R.id.POST_title );
+		m_titleView.setText( m_post.title );
+		m_titleView.setOnClickListener( this );
 
 		m_nextPostButton = (Button) view.findViewById( R.id.POST_load_image_button );
 
@@ -155,12 +164,9 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 				if( activity != null && isAdded() )
 				{
 					Uri uri = Uri.parse( m_post.url );
-					if( uri != null )
-					{
-						Intent intent = new Intent( activity, DownloadService.class );
-						intent.setData( uri );
-						activity.startService( intent );
-					}
+					Intent intent = new Intent( activity, DownloadService.class );
+					intent.setData( uri );
+					activity.startService( intent );
 
 					Analytics.trackDownload( activity, m_category );
 				}
@@ -172,13 +178,10 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 				if( activity != null && isAdded() )
 				{
 					Uri uri = Uri.parse( m_post.url );
-					if( uri != null )
-					{
-						Intent intent = new Intent( activity, DownloadService.class );
-						intent.setData( uri );
-						intent.putExtra( DownloadService.EXTRA_SET_WALLPAPER, true );
-						activity.startService( intent );
-					}
+					Intent intent = new Intent( activity, DownloadService.class );
+					intent.setData( uri );
+					intent.putExtra( DownloadService.EXTRA_SET_WALLPAPER, true );
+					activity.startService( intent );
 
 					Analytics.trackWallpaper( activity, m_category );
 				}
@@ -245,9 +248,39 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	@Override
 	public void onClick( final View v )
 	{
-		AlertDialog.Builder builder = new AlertDialog.Builder( v.getContext() );
-		builder.setMessage( m_post.title );
-		m_titleDialog = builder.create();
-		m_titleDialog.show();
+		final Context context = v.getContext();
+		if( context != null )
+		{
+			AlertDialog.Builder builder = new AlertDialog.Builder( context );
+			builder.setMessage( m_post.title );
+			m_titleDialog = builder.create();
+			m_titleDialog.show();
+		}
+	}
+
+	@Override
+	public void beganZooming( final UriImageView uriImageView )
+	{
+		ObjectAnimator toolbarAnim = ObjectAnimator.ofFloat( m_toolBarView, "translationY", m_toolBarView.getHeight() );
+		toolbarAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
+		toolbarAnim.setDuration( 400 );
+		toolbarAnim.start();
+
+		ObjectAnimator titleAnim = ObjectAnimator.ofFloat( m_titleView, "translationY", -m_toolBarView.getHeight() );
+		titleAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
+		titleAnim.setDuration( 400 );
+		titleAnim.start();
+	}
+
+	@Override
+	public void endedZooming( final UriImageView uriImageView )
+	{
+		ObjectAnimator toolbarAnim = ObjectAnimator.ofFloat( m_toolBarView, "translationY", 0.0f );
+		toolbarAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
+		toolbarAnim.start();
+
+		ObjectAnimator titleAnim = ObjectAnimator.ofFloat( m_titleView, "translationY", 0.0f );
+		titleAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
+		titleAnim.start();
 	}
 }
