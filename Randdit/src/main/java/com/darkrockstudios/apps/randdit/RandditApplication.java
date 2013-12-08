@@ -7,7 +7,7 @@ import android.util.LruCache;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
-import com.com.darkrockstudios.views.uriimageview.LruDrawableCache;
+import com.darkrockstudios.views.uriimageview.LruDrawableCache;
 
 /**
  * Created by Adam on 11/11/13.

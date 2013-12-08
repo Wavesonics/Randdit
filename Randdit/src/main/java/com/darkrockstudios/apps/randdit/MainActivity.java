@@ -30,6 +30,7 @@ import com.darkrockstudios.apps.randdit.misc.Analytics;
 import com.darkrockstudios.apps.randdit.misc.NavDrawerAdapter;
 import com.darkrockstudios.apps.randdit.misc.NextButtonEnabler;
 import com.darkrockstudios.apps.randdit.misc.Post;
+import com.darkrockstudios.apps.randdit.misc.Preferences;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.gson.Gson;
@@ -77,19 +78,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 		PreferenceManager.setDefaultValues( this, R.xml.settings, false );
 
-		m_drawerLayout = (DrawerLayout) findViewById( R.id.drawer_layout );
-
-		m_drawerToggle =
-				new DrawerToggle( this, m_drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close );
-		m_drawerLayout.setDrawerListener( m_drawerToggle );
-
-		getActionBar().setDisplayHomeAsUpEnabled( true );
-		getActionBar().setHomeButtonEnabled( true );
-
-		m_navDrawerView = (ListView) findViewById( R.id.left_drawer );
-		m_navDrawerAdapter = new NavDrawerAdapter( this );
-		m_navDrawerView.setAdapter( m_navDrawerAdapter );
-		m_navDrawerView.setOnItemClickListener( this );
+        setupNavDrawer();
 
 		m_posts = new LinkedList<>();
 
@@ -126,6 +115,23 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
 		}
 	}
+
+    private void setupNavDrawer()
+    {
+        m_drawerLayout = (DrawerLayout) findViewById( R.id.drawer_layout );
+
+        m_drawerToggle =
+                new DrawerToggle( this, m_drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close );
+        m_drawerLayout.setDrawerListener( m_drawerToggle );
+
+        getActionBar().setDisplayHomeAsUpEnabled( true );
+        getActionBar().setHomeButtonEnabled( true );
+
+        m_navDrawerView = (ListView) findViewById( R.id.left_drawer );
+        m_navDrawerAdapter = new NavDrawerAdapter( this );
+        m_navDrawerView.setAdapter( m_navDrawerAdapter );
+        m_navDrawerView.setOnItemClickListener( this );
+    }
 
 	private Post getPostFromIntent()
 	{
@@ -253,7 +259,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		m_isActive = true;
 
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( this );
-		if( settings.getBoolean( "pref_key_keep_screen_on", true ) )
+		if( settings.getBoolean(Preferences.KEY_KEEP_SCREEN_ON, true ) )
 		{
 			getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON );
 		}
@@ -261,6 +267,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		{
 			getWindow().clearFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON );
 		}
+
+        // Refresh the adapter to accommodate changes to what is shown
+        m_navDrawerAdapter.refreshNavItems();
 	}
 
 	@Override

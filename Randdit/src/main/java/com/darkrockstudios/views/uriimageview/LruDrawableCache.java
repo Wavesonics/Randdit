@@ -1,4 +1,4 @@
-package com.com.darkrockstudios.views.uriimageview;
+package com.darkrockstudios.views.uriimageview;
 
 import android.graphics.drawable.Drawable;
 import android.net.Uri;

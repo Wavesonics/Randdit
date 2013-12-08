@@ -1,7 +1,9 @@
 package com.darkrockstudios.apps.randdit.misc;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,14 +30,30 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
 	{
 		super( context, android.R.layout.simple_list_item_1 );
 
-		add( NavItem.all );
-		add( NavItem.new_ );
-		add( NavItem.funny );
-		add( NavItem.cute );
-		add( NavItem.beautiful );
-		add( NavItem.gifs );
-		add( NavItem.wtf );
+        refreshNavItems();
 	}
+
+    public void refreshNavItems()
+    {
+        clear();
+
+        add( NavItem.all );
+        add( NavItem.new_ );
+        add( NavItem.funny );
+        add( NavItem.cute );
+        add( NavItem.beautiful );
+        add( NavItem.gifs );
+        if( wtfEnabled() )
+        {
+            add( NavItem.wtf );
+        }
+    }
+
+    private boolean wtfEnabled()
+    {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext());
+        return settings.getBoolean( Preferences.KEY_SHOW_WTF, false );
+    }
 
 	@Override
 	public View getView (int position, View convertView, ViewGroup parent)

@@ -19,8 +19,6 @@ import android.widget.Button;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
-import com.com.darkrockstudios.views.uriimageview.UriImageHandler;
-import com.com.darkrockstudios.views.uriimageview.UriImageView;
 import com.darkrockstudios.apps.randdit.DownloadService;
 import com.darkrockstudios.apps.randdit.R;
 import com.darkrockstudios.apps.randdit.RandditApplication;
@@ -28,6 +26,8 @@ import com.darkrockstudios.apps.randdit.misc.Analytics;
 import com.darkrockstudios.apps.randdit.misc.NavDrawerAdapter;
 import com.darkrockstudios.apps.randdit.misc.NextButtonEnabler;
 import com.darkrockstudios.apps.randdit.misc.Post;
+import com.darkrockstudios.views.uriimageview.UriImageHandler;
+import com.darkrockstudios.views.uriimageview.UriImageView;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;

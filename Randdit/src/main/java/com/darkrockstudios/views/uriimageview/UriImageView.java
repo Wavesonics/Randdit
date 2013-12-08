@@ -1,4 +1,4 @@
-package com.com.darkrockstudios.views.uriimageview;
+package com.darkrockstudios.views.uriimageview;
 
 import android.content.Context;
 import android.graphics.Canvas;

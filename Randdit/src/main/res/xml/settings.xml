@@ -9,5 +9,10 @@
             android:summary="@string/pref_summary_keep_screen_on"
             android:title="@string/pref_title_keep_screen_on"
             android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="pref_key_show_wtf"
+            android:summary="@string/pref_summary_show_wtf"
+            android:title="@string/pref_title_show_wtf"
+            android:defaultValue="false" />
     </PreferenceCategory>
 </PreferenceScreen>
