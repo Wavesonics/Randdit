@@ -7,6 +7,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -58,6 +61,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	private NavDrawerAdapter m_navDrawerAdapter;
 	private LinkedList<Post> m_posts;
 
+	private NfcAdapter m_nfcAdapter;
+
 	private NavDrawerAdapter.NavItem m_currentCategory;
 
 	private boolean m_isActive;
@@ -78,11 +83,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 		PreferenceManager.setDefaultValues( this, R.xml.settings, false );
 
-        setupNavDrawer();
+		setupNavDrawer();
+
+		initNfc();
 
 		m_posts = new LinkedList<>();
 
-		final String postId = getPostFromIntent();
+		final String postId = getPostFromIntent( getIntent() );
 		if( postId == null )
 		{
 			if( savedInstanceState != null )
@@ -113,45 +120,49 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		}
 	}
 
-    private void setupNavDrawer()
-    {
-        m_drawerLayout = (DrawerLayout) findViewById( R.id.drawer_layout );
+	private void setupNavDrawer()
+	{
+		m_drawerLayout = (DrawerLayout) findViewById( R.id.drawer_layout );
 
-        m_drawerToggle =
-                new DrawerToggle( this, m_drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close );
-        m_drawerLayout.setDrawerListener( m_drawerToggle );
+		m_drawerToggle =
+				new DrawerToggle( this, m_drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close );
+		m_drawerLayout.setDrawerListener( m_drawerToggle );
 
-        getActionBar().setDisplayHomeAsUpEnabled( true );
-        getActionBar().setHomeButtonEnabled( true );
+		getActionBar().setDisplayHomeAsUpEnabled( true );
+		getActionBar().setHomeButtonEnabled( true );
 
-        m_navDrawerView = (ListView) findViewById( R.id.left_drawer );
-        m_navDrawerAdapter = new NavDrawerAdapter( this );
-        m_navDrawerView.setAdapter( m_navDrawerAdapter );
-        m_navDrawerView.setOnItemClickListener( this );
-    }
+		m_navDrawerView = (ListView) findViewById( R.id.left_drawer );
+		m_navDrawerAdapter = new NavDrawerAdapter( this );
+		m_navDrawerView.setAdapter( m_navDrawerAdapter );
+		m_navDrawerView.setOnItemClickListener( this );
+	}
 
-	private String getPostFromIntent()
+	private String getPostFromIntent( final Intent intent )
 	{
 		String postId = null;
 
-		Intent intent = getIntent();
-		if( intent != null && Intent.ACTION_VIEW.equals( intent.getAction() ) && intent.getData() != null )
+		if( intent != null )
 		{
-			Uri uri = intent.getData();
-			List<String> pathSegments = uri.getPathSegments();
-			if( pathSegments != null && pathSegments.size() > 1 )
+			if( (Intent.ACTION_VIEW.equals( intent.getAction() ) ||
+			     NfcAdapter.ACTION_NDEF_DISCOVERED.equals( intent.getAction() ))
+			    && intent.getData() != null )
 			{
-				// We have a post at the point, so set our category
-				try
+				Uri uri = intent.getData();
+				List<String> pathSegments = uri.getPathSegments();
+				if( pathSegments != null && pathSegments.size() > 1 )
 				{
-					updateCategory( NavDrawerAdapter.NavItem.valueOf( pathSegments.get( 0 ) ) );
-				}
-				catch( IllegalArgumentException e )
-				{
-					updateCategory( NavDrawerAdapter.NavItem.all );
-				}
+					// We have a post at the point, so set our category
+					try
+					{
+						updateCategory( NavDrawerAdapter.NavItem.valueOf( pathSegments.get( 0 ) ) );
+					}
+					catch( IllegalArgumentException e )
+					{
+						updateCategory( NavDrawerAdapter.NavItem.all );
+					}
 
-				postId = pathSegments.get( 1 );
+					postId = pathSegments.get( 1 );
+				}
 			}
 		}
 
@@ -246,7 +257,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		m_isActive = true;
 
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( this );
-		if( settings.getBoolean(Preferences.KEY_KEEP_SCREEN_ON, true ) )
+		if( settings.getBoolean( Preferences.KEY_KEEP_SCREEN_ON, true ) )
 		{
 			getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON );
 		}
@@ -255,8 +266,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			getWindow().clearFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON );
 		}
 
-        // Refresh the adapter to accommodate changes to what is shown
-        m_navDrawerAdapter.refreshNavItems();
+		// Refresh the adapter to accommodate changes to what is shown
+		m_navDrawerAdapter.refreshNavItems();
 	}
 
 	@Override
@@ -267,7 +278,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		m_isActive = false;
 	}
 
-	private void updateCategory( NavDrawerAdapter.NavItem category )
+	private void updateCategory( final NavDrawerAdapter.NavItem category )
 	{
 		m_currentCategory = category;
 		setTitle();
@@ -337,6 +348,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 				PostFragment fragment = PostFragment.newInstance( post, m_currentCategory );
 				fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
+
+				updateNfcMessage( post );
 			}
 		}
 		else
@@ -378,6 +391,27 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		}
 
 		getActionBar().setTitle( newTitle );
+	}
+
+	private void initNfc()
+	{
+		m_nfcAdapter = NfcAdapter.getDefaultAdapter( this );
+		if( m_nfcAdapter == null )
+		{
+			Log.i( TAG, "NFC not available. Android Beam functionality disabled." );
+		}
+	}
+
+	private void updateNfcMessage( final Post post )
+	{
+		if( m_nfcAdapter != null )
+		{
+			NdefRecord record = NdefRecord.createUri( PostFragment.createRandditUrl( post, m_currentCategory ) );
+			NdefRecord[] records = new NdefRecord[ 1 ];
+			records[ 0 ] = record;
+			NdefMessage message = new NdefMessage( records );
+			m_nfcAdapter.setNdefPushMessage( message, this );
+		}
 	}
 
 	private class RandditPostHandler implements Response.Listener<JSONObject>, Response.ErrorListener

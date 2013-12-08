@@ -197,12 +197,12 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		return handled;
 	}
 
-	private String createRandditUrl( final Post post )
+	public static String createRandditUrl( final Post post, NavDrawerAdapter.NavItem category )
 	{
 		String randditBase = "http://randdit.com/";
-		String category = NavDrawerAdapter.getId( m_category );
+		String categoryStr = NavDrawerAdapter.getId( category );
 
-		String url = randditBase + category + '/' + post.id;
+		String url = randditBase + categoryStr + '/' + post.id;
 
 		return url;
 	}
@@ -211,7 +211,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	{
 		Intent intent = new Intent( Intent.ACTION_SEND );
 		intent.setData( Uri.parse( post.url ) );
-		String shareBody = getString( R.string.share_body, Html.fromHtml( post.title ), createRandditUrl( post ) );
+		String shareBody = getString( R.string.share_body, Html.fromHtml( post.title ), createRandditUrl( post, m_category ) );
 		intent.putExtra( Intent.EXTRA_TEXT, shareBody );
 		intent.setType( "image/*" );
 
