@@ -76,7 +76,7 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 	public void cancel()
 	{
 		Log.d( TAG, "Canceling download for URI: " + (m_uri != null ? m_uri : "null") );
-		m_canceled = false;
+		m_canceled = true;
 	}
 
 	public Uri getUri()
@@ -158,7 +158,7 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 			}
 			inputStream = new BufferedInputStream( urlConnection.getInputStream() );
 
-			final int BUF_SIZE = 1024;
+			final int BUF_SIZE = 1024 * 2;
 			final byte[] buffer = new byte[ BUF_SIZE ];
 
 			int bytesRead;
@@ -175,6 +175,12 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 					}
 				}
 			} while( bytesRead > 0 && !m_canceled );
+
+			if( m_canceled )
+			{
+				Log.d( TAG,
+				       "Image download canceled! " + imageStream.size() + "B of " + contentLength + "B had been downloaded" );
+			}
 		}
 		catch( IOException e )
 		{
@@ -198,7 +204,36 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 					e.printStackTrace();
 				}
 			}
+
+			// If canceled, close our image stream
+			if( m_canceled )
+			{
+				try
+				{
+					imageStream.close();
+				}
+				catch( IOException e )
+				{
+					e.printStackTrace();
+				}
+			}
 		}
+
+		if( !m_canceled )
+		{
+			Drawable downloadedDrawable = createDrawable( imageStream, mimeTypes );
+			if( downloadedDrawable != null )
+			{
+				drawable = downloadedDrawable;
+			}
+		}
+
+		return drawable;
+	}
+
+	private Drawable createDrawable( ByteArrayOutputStream imageStream, List<String> mimeTypes )
+	{
+		Drawable drawable = null;
 
 		try
 		{

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -126,7 +127,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		m_toolBarView = view.findViewById( R.id.POST_tool_bar );
 
 		m_titleView = (TextView) view.findViewById( R.id.POST_title );
-		m_titleView.setText( m_post.title );
+		m_titleView.setText( Html.fromHtml( m_post.title ) );
 		m_titleView.setOnClickListener( this );
 
 		m_nextPostButton = (Button) view.findViewById( R.id.POST_load_image_button );
@@ -210,7 +211,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	{
 		Intent intent = new Intent( Intent.ACTION_SEND );
 		intent.setData( Uri.parse( post.url ) );
-		String shareBody = getString( R.string.share_body, post.title, createRandditUrl( post ) );
+		String shareBody = getString( R.string.share_body, Html.fromHtml( post.title ), createRandditUrl( post ) );
 		intent.putExtra( Intent.EXTRA_TEXT, shareBody );
 		intent.setType( "image/*" );
 
@@ -252,7 +253,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		if( context != null )
 		{
 			AlertDialog.Builder builder = new AlertDialog.Builder( context );
-			builder.setMessage( m_post.title );
+			builder.setMessage( Html.fromHtml( m_post.title ) );
 			m_titleDialog = builder.create();
 			m_titleDialog.show();
 		}

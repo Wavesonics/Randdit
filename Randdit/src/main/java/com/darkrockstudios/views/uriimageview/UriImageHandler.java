@@ -10,6 +10,8 @@ import android.widget.ProgressBar;
  */
 public class UriImageHandler
 {
+	private static final String TAG = UriImageHandler.class.getSimpleName();
+
 	private UriImageView         m_imageView;
 	private UriImageDownloadTask m_downloadTask;
 	private Drawable             m_pendingDrawable;

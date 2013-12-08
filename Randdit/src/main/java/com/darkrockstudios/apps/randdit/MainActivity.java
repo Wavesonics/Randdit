@@ -144,11 +144,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 				// We have a post at the point, so set our category
 				try
 				{
-					m_currentCategory = NavDrawerAdapter.NavItem.valueOf( pathSegments.get( 0 ) );
+					updateCategory( NavDrawerAdapter.NavItem.valueOf( pathSegments.get( 0 ) ) );
 				}
 				catch( IllegalArgumentException e )
 				{
-					m_currentCategory = NavDrawerAdapter.NavItem.all;
+					updateCategory( NavDrawerAdapter.NavItem.all );
 				}
 
 				postId = pathSegments.get( 1 );
@@ -267,6 +267,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		m_isActive = false;
 	}
 
+	private void updateCategory( NavDrawerAdapter.NavItem category )
+	{
+		m_currentCategory = category;
+		setTitle();
+	}
+
 	private void requestPost( final String postId )
 	{
 		setProgressBarIndeterminateVisibility( true );
@@ -313,8 +319,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	{
 		if( m_currentCategory == null )
 		{
-			m_currentCategory = NavDrawerAdapter.NavItem.all;
-			setTitle();
+			updateCategory( NavDrawerAdapter.NavItem.all );
 		}
 
 		Analytics.trackNextImageClick( this, m_currentCategory );
