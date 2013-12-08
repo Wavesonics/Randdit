@@ -5,6 +5,7 @@ package com.darkrockstudios.apps.randdit.misc;
  */
 public class Preferences
 {
-    public static final String KEY_SHOW_WTF = "pref_key_show_wtf";
-    public static final String KEY_KEEP_SCREEN_ON = "pref_key_keep_screen_on";
+	public static final String KEY_SHOW_WTF          = "pref_key_show_wtf";
+	public static final String KEY_KEEP_SCREEN_ON    = "pref_key_keep_screen_on";
+	public static final String KEY_SHOW_WIFI_WARNING = "pref_key_wifi_warning";
 }

@@ -1,11 +1,16 @@
 package com.darkrockstudios.apps.randdit;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -14,6 +19,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -61,7 +67,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	private NavDrawerAdapter m_navDrawerAdapter;
 	private LinkedList<Post> m_posts;
 
-	private NfcAdapter m_nfcAdapter;
+	private NfcAdapter  m_nfcAdapter;
+	private AlertDialog m_wifiAlert;
 
 	private NavDrawerAdapter.NavItem m_currentCategory;
 
@@ -268,6 +275,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 		// Refresh the adapter to accommodate changes to what is shown
 		m_navDrawerAdapter.refreshNavItems();
+
+		if( shouldShowWifiWarning() )
+		{
+			presentDataWarning();
+		}
 	}
 
 	@Override
@@ -276,6 +288,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		super.onPause();
 
 		m_isActive = false;
+
+		if( m_wifiAlert != null )
+		{
+			m_wifiAlert.dismiss();
+			m_wifiAlert = null;
+		}
 	}
 
 	private void updateCategory( final NavDrawerAdapter.NavItem category )
@@ -411,6 +429,75 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			records[ 0 ] = record;
 			NdefMessage message = new NdefMessage( records );
 			m_nfcAdapter.setNdefPushMessage( message, this );
+		}
+	}
+
+	private boolean isOnWifi()
+	{
+		final boolean onWifi;
+
+		ConnectivityManager connManager = (ConnectivityManager) getSystemService( CONNECTIVITY_SERVICE );
+		NetworkInfo wifi = connManager.getNetworkInfo( ConnectivityManager.TYPE_WIFI );
+
+		if( wifi != null && wifi.isConnected() )
+		{
+			onWifi = true;
+		}
+		else
+		{
+			onWifi = false;
+		}
+
+		return onWifi;
+	}
+
+	private void presentDataWarning()
+	{
+		if( m_wifiAlert == null )
+		{
+			WifiDialogListener listener = new WifiDialogListener();
+
+			AlertDialog.Builder builder = new AlertDialog.Builder( this );
+			builder.setTitle( "Data usage warning!" );
+			builder.setIcon( R.drawable.ic_action_bars );
+			builder.setMessage( Html.fromHtml( "<strong>It looks like you're not on Wifi.</strong><br /><br />Randdit can end up using a ton of data (<em>some of those Doge GIFs are HUGE!</em>). So be careful and make sure you aren't blowing through your data plan." ) );
+			builder.setNegativeButton( "Ok", null );
+			builder.setPositiveButton( "Ok, don't warn me again", listener );
+			m_wifiAlert = builder.create();
+			m_wifiAlert.show();
+		}
+	}
+
+	private boolean shouldShowWifiWarning()
+	{
+		final boolean shouldShow;
+
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( MainActivity.this );
+		boolean showWifiWarning = settings.getBoolean( Preferences.KEY_SHOW_WIFI_WARNING, true );
+		if( showWifiWarning && !isOnWifi() )
+		{
+			shouldShow = true;
+		}
+		else
+		{
+			shouldShow = false;
+		}
+
+		return shouldShow;
+	}
+
+	private class WifiDialogListener implements Dialog.OnClickListener
+	{
+		@Override
+		public void onClick( final DialogInterface dialog, final int which )
+		{
+			if( which == DialogInterface.BUTTON_POSITIVE )
+			{
+				SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( MainActivity.this );
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putBoolean( Preferences.KEY_SHOW_WIFI_WARNING, false );
+				editor.apply();
+			}
 		}
 	}
 
