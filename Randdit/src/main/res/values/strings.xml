@@ -27,4 +27,10 @@
     <string name="toast_wallpaper_failed">Failed to set wallpaper</string>
     <string name="toast_wallpaper_success">Wallpaper set!</string>
 
+    <string name="postinfo_title">Post Info</string>
+    <string name="postinfo_user">User: </string>
+    <string name="postinfo_created">Created: </string>
+    <string name="postinfo_from">from /r/%1$s</string>
+    <string name="postinfo_no_creation_date">unknown</string>
+
 </resources>

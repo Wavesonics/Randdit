@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/postinfo_padding">
+
+        <TextView
+            android:id="@+id/POSTINFO_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textStyle="bold"
+            tools:text="Post Title"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/postinfo_spacing">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/postinfo_user"/>
+
+            <TextView
+                android:id="@+id/POSTINFO_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/postinfo_spacing"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                tools:text="authorsUserName"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/postinfo_spacing">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/postinfo_created"/>
+
+            <TextView
+                android:id="@+id/POSTINFO_created"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/postinfo_spacing"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                tools:text="10/24/2013"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/POSTINFO_subreddit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/postinfo_spacing"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:autoLink="web"
+            android:text="@string/postinfo_from"/>
+
+    </LinearLayout>
+</ScrollView>

@@ -4,7 +4,7 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.Context;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,6 +39,8 @@ import com.google.analytics.tracking.android.MapBuilder;
 public class PostFragment extends Fragment implements View.OnClickListener, NextButtonEnabler, UriImageView.ImageZoomListener
 {
 	private static final String TAG = PostFragment.class.getSimpleName();
+
+	private static final String FRAGMENT_TAG_POST_INFO = "PostInfoFragment";
 
 	private static final String ARG_POST = PostFragment.class.getName() + ".POST";
 	private static final String ARG_CATEGORY = PostFragment.class.getName() + ".CATEGORY";
@@ -249,13 +251,11 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	@Override
 	public void onClick( final View v )
 	{
-		final Context context = v.getContext();
-		if( context != null )
+		FragmentManager fragmentManager = getFragmentManager();
+		if( fragmentManager != null )
 		{
-			AlertDialog.Builder builder = new AlertDialog.Builder( context );
-			builder.setMessage( Html.fromHtml( m_post.title ) );
-			m_titleDialog = builder.create();
-			m_titleDialog.show();
+			PostInfoFragment editNameDiapostInfoFragmentog = PostInfoFragment.newInstance( m_post );
+			editNameDiapostInfoFragmentog.show( fragmentManager, FRAGMENT_TAG_POST_INFO );
 		}
 	}
 

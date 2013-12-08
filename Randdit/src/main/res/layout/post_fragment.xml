@@ -17,6 +17,7 @@
         android:id="@+id/POST_title"
         android:layout_width="match_parent"
         android:layout_height="@dimen/post_bar"
+        android:drawableLeft="@drawable/ic_action_info"
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearanceLarge"
         tools:text="Large Text"
