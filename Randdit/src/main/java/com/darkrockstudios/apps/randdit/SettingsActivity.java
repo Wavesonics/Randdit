@@ -11,7 +11,10 @@ import com.darkrockstudios.apps.randdit.fragments.SettingsFragment;
 /**
  * Created by Adam on 11/23/13.
  */
-public class SettingsActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener
+{
+	private static final String TAG = SettingsActivity.class.getSimpleName();
+
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
 	{
@@ -23,21 +26,26 @@ public class SettingsActivity extends Activity implements SharedPreferences.OnSh
 				.commit();
 	}
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+	@Override
+	protected void onStart()
+	{
+		super.onStart();
 
-        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
-    }
+		PreferenceManager.getDefaultSharedPreferences( this ).registerOnSharedPreferenceChangeListener( this );
+	}
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
-    }
+	@Override
+	protected void onStop()
+	{
+		super.onStop();
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        BackupManager.dataChanged(RandditApplication.class.getPackage().getName());
-    }
+		PreferenceManager.getDefaultSharedPreferences( this ).unregisterOnSharedPreferenceChangeListener( this );
+	}
+
+	@Override
+	public void onSharedPreferenceChanged( SharedPreferences sharedPreferences, String key )
+	{
+		BackupManager backupManager = new BackupManager( this );
+		backupManager.dataChanged();
+	}
 }

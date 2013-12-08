@@ -82,8 +82,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 		m_posts = new LinkedList<>();
 
-		final Post post = getPostFromIntent();
-		if( post == null )
+		final String postId = getPostFromIntent();
+		if( postId == null )
 		{
 			if( savedInstanceState != null )
 			{
@@ -109,10 +109,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		}
 		else
 		{
-			FragmentManager fragmentManager = getFragmentManager();
-
-			PostFragment fragment = PostFragment.newInstance( post, m_currentCategory );
-			fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
+			requestPost( postId );
 		}
 	}
 
@@ -133,9 +130,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         m_navDrawerView.setOnItemClickListener( this );
     }
 
-	private Post getPostFromIntent()
+	private String getPostFromIntent()
 	{
-		Post post = null;
+		String postId = null;
 
 		Intent intent = getIntent();
 		if( intent != null && Intent.ACTION_VIEW.equals( intent.getAction() ) && intent.getData() != null )
@@ -144,18 +141,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			List<String> pathSegments = uri.getPathSegments();
 			if( pathSegments != null && pathSegments.size() > 1 )
 			{
-				post = new Post();
-				post.id = pathSegments.get( 1 );
-
-				if( pathSegments.size() > 2 )
-				{
-					post.title = pathSegments.get( 2 );
-				}
-				else
-				{
-					post.title = "";
-				}
-
 				// We have a post at the point, so set our category
 				try
 				{
@@ -165,10 +150,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 				{
 					m_currentCategory = NavDrawerAdapter.NavItem.all;
 				}
+
+				postId = pathSegments.get( 1 );
 			}
 		}
 
-		return post;
+		return postId;
 	}
 
 	protected void onSaveInstanceState( final Bundle outState )
@@ -278,6 +265,20 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		super.onPause();
 
 		m_isActive = false;
+	}
+
+	private void requestPost( final String postId )
+	{
+		setProgressBarIndeterminateVisibility( true );
+		setNextImageButtonEnabled( false );
+
+		final String url = "http://randdit.com/" + NavDrawerAdapter.getId( m_currentCategory ) + "/" + postId + "/?api";
+		RandditPostHandler responseHandler = new RandditPostHandler();
+		JsonObjectRequest jsObjRequest =
+				new JsonObjectRequest( url, null, responseHandler, responseHandler );
+
+		RequestQueue requestQueue = RandditApplication.getRequestQueue();
+		requestQueue.add( jsObjRequest );
 	}
 
 	private void requestPosts()
