@@ -81,29 +81,26 @@ public class MainActivity extends NavDrawerActivity
 		m_posts = new LinkedList<>();
 
 		final String postId = getPostFromIntent( getIntent() );
-		if( postId == null )
+		if( savedInstanceState != null )
 		{
-			if( savedInstanceState != null )
+			if( savedInstanceState.containsKey( SAVE_POSTS ) )
 			{
-				if( savedInstanceState.containsKey( SAVE_POSTS ) )
-				{
-					List<Post> postList = (List<Post>) savedInstanceState.getSerializable( SAVE_POSTS );
-					m_posts.addAll( postList );
-				}
-
-				if( savedInstanceState.containsKey( SAVE_NAV_ITEM ) )
-				{
-					m_currentCategory = (NavDrawerAdapter.NavItem) savedInstanceState.getSerializable( SAVE_NAV_ITEM );
-					setTitle();
-				}
+				List<Post> postList = (List<Post>) savedInstanceState.getSerializable( SAVE_POSTS );
+				m_posts.addAll( postList );
 			}
-			else
+
+			if( savedInstanceState.containsKey( SAVE_NAV_ITEM ) )
 			{
-				IntroFragment fragment = IntroFragment.newInstance();
-
-				FragmentManager fragmentManager = getFragmentManager();
-				fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
+				m_currentCategory = (NavDrawerAdapter.NavItem) savedInstanceState.getSerializable( SAVE_NAV_ITEM );
+				setTitle();
 			}
+		}
+		else if( postId == null )
+		{
+			IntroFragment fragment = IntroFragment.newInstance();
+
+			FragmentManager fragmentManager = getFragmentManager();
+			fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
 		}
 		else
 		{
