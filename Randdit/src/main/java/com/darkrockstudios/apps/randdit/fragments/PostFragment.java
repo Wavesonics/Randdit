@@ -1,12 +1,14 @@
 package com.darkrockstudios.apps.randdit.fragments;
 
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -39,6 +41,8 @@ import com.google.analytics.tracking.android.MapBuilder;
 public class PostFragment extends Fragment implements View.OnClickListener, NextButtonEnabler, UriImageView.ImageZoomListener
 {
 	private static final String TAG = PostFragment.class.getSimpleName();
+
+	private static final boolean IS_API_17_OR_LATER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1;
 
 	private static final String FRAGMENT_TAG_POST_INFO = "PostInfoFragment";
 
@@ -147,6 +151,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		return view;
 	}
 
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 	@Override
 	public void onViewCreated( View view, Bundle savedInstanceState )
 	{
@@ -155,9 +160,17 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		ViewGroup postInfoContainer = (ViewGroup) view.findViewById( R.id.POST_post_info_container );
 		if( postInfoContainer != null )
 		{
-			FragmentManager fragmentManager = getFragmentManager();
 			PostInfoFragment postInfoFragment = PostInfoFragment.newInstance( m_post );
-			fragmentManager.beginTransaction().replace( R.id.POST_post_info_container, postInfoFragment ).commit();
+
+			if( IS_API_17_OR_LATER )
+			{
+				getChildFragmentManager().beginTransaction().replace( R.id.POST_post_info_container, postInfoFragment )
+						.commit();
+			}
+			else
+			{
+				getFragmentManager().beginTransaction().replace( R.id.POST_post_info_container, postInfoFragment ).commit();
+			}
 		}
 	}
 
