@@ -5,6 +5,7 @@ import android.app.backup.BackupManager;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.MenuItem;
 
 import com.darkrockstudios.apps.randdit.fragments.SettingsFragment;
 
@@ -19,6 +20,9 @@ public class SettingsActivity extends Activity implements SharedPreferences.OnSh
 	protected void onCreate( Bundle savedInstanceState )
 	{
 		super.onCreate( savedInstanceState );
+
+		getActionBar().setDisplayHomeAsUpEnabled( true );
+		getActionBar().setHomeButtonEnabled( true );
 
 		// Display the fragment as the main content.
 		getFragmentManager().beginTransaction()
@@ -40,6 +44,23 @@ public class SettingsActivity extends Activity implements SharedPreferences.OnSh
 		super.onStop();
 
 		PreferenceManager.getDefaultSharedPreferences( this ).unregisterOnSharedPreferenceChangeListener( this );
+	}
+
+	@Override
+	public boolean onOptionsItemSelected( final MenuItem item )
+	{
+		final boolean handled;
+		if( item.getItemId() == android.R.id.home )
+		{
+			finish();
+			handled = true;
+		}
+		else
+		{
+			handled = false;
+		}
+
+		return handled;
 	}
 
 	@Override

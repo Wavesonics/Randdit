@@ -56,6 +56,8 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	private ShareActionProvider m_shareActionProvider;
 	private AlertDialog         m_titleDialog;
 
+	private boolean m_isTabletLayout;
+
 	public static PostFragment newInstance( final Post post, final NavDrawerAdapter.NavItem category )
 	{
 		PostFragment fragment = new PostFragment();
@@ -126,15 +128,37 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		m_imageHandler.loadImage( uri, m_imageView, RandditApplication.getImageCache() );
 		m_imageView.setZoomListener( this );
 
+		if( view.findViewById( R.id.POST_post_info_container ) != null )
+		{
+			m_isTabletLayout = true;
+		}
+
 		m_toolBarView = view.findViewById( R.id.POST_tool_bar );
 
 		m_titleView = (TextView) view.findViewById( R.id.POST_title );
-		m_titleView.setText( Html.fromHtml( m_post.title ) );
-		m_titleView.setOnClickListener( this );
+		if( m_titleView != null )
+		{
+			m_titleView.setText( Html.fromHtml( m_post.title ) );
+			m_titleView.setOnClickListener( this );
+		}
 
 		m_nextPostButton = (Button) view.findViewById( R.id.POST_load_image_button );
 
 		return view;
+	}
+
+	@Override
+	public void onViewCreated( View view, Bundle savedInstanceState )
+	{
+		super.onViewCreated( view, savedInstanceState );
+
+		ViewGroup postInfoContainer = (ViewGroup) view.findViewById( R.id.POST_post_info_container );
+		if( postInfoContainer != null )
+		{
+			FragmentManager fragmentManager = getFragmentManager();
+			PostInfoFragment postInfoFragment = PostInfoFragment.newInstance( m_post );
+			fragmentManager.beginTransaction().replace( R.id.POST_post_info_container, postInfoFragment ).commit();
+		}
 	}
 
 	@Override
@@ -259,29 +283,46 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		}
 	}
 
+	private boolean shouldDissmissUi()
+	{
+		return !m_isTabletLayout;
+	}
+
 	@Override
 	public void beganZooming( final UriImageView uriImageView )
 	{
-		ObjectAnimator toolbarAnim = ObjectAnimator.ofFloat( m_toolBarView, "translationY", m_toolBarView.getHeight() );
-		toolbarAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
-		toolbarAnim.setDuration( 400 );
-		toolbarAnim.start();
+		if( shouldDissmissUi() )
+		{
+			ObjectAnimator toolbarAnim = ObjectAnimator.ofFloat( m_toolBarView, "translationY", m_toolBarView.getHeight() );
+			toolbarAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
+			toolbarAnim.setDuration( 400 );
+			toolbarAnim.start();
 
-		ObjectAnimator titleAnim = ObjectAnimator.ofFloat( m_titleView, "translationY", -m_toolBarView.getHeight() );
-		titleAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
-		titleAnim.setDuration( 400 );
-		titleAnim.start();
+			if( m_titleView != null )
+			{
+				ObjectAnimator titleAnim = ObjectAnimator.ofFloat( m_titleView, "translationY", -m_toolBarView.getHeight() );
+				titleAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
+				titleAnim.setDuration( 400 );
+				titleAnim.start();
+			}
+		}
 	}
 
 	@Override
 	public void endedZooming( final UriImageView uriImageView )
 	{
-		ObjectAnimator toolbarAnim = ObjectAnimator.ofFloat( m_toolBarView, "translationY", 0.0f );
-		toolbarAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
-		toolbarAnim.start();
+		if( shouldDissmissUi() )
+		{
+			ObjectAnimator toolbarAnim = ObjectAnimator.ofFloat( m_toolBarView, "translationY", 0.0f );
+			toolbarAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
+			toolbarAnim.start();
 
-		ObjectAnimator titleAnim = ObjectAnimator.ofFloat( m_titleView, "translationY", 0.0f );
-		titleAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
-		titleAnim.start();
+			if( m_titleView != null )
+			{
+				ObjectAnimator titleAnim = ObjectAnimator.ofFloat( m_titleView, "translationY", 0.0f );
+				titleAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
+				titleAnim.start();
+			}
+		}
 	}
 }

@@ -8,11 +8,21 @@
             android:key="pref_key_keep_screen_on"
             android:summary="@string/pref_summary_keep_screen_on"
             android:title="@string/pref_title_keep_screen_on"
-            android:defaultValue="true" />
+            android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="pref_key_show_wtf"
             android:summary="@string/pref_summary_show_wtf"
             android:title="@string/pref_title_show_wtf"
-            android:defaultValue="false" />
+            android:defaultValue="false"/>
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/pref_stats_title"
+        android:key="pref_key_storage_stats">
+        <com.darkrockstudios.apps.randdit.misc.StatsPreference
+            android:title="@string/pref_image_views_title"
+            android:key="pref_key_image_views"
+            android:defaultValue="0"
+            android:enabled="false"/>
     </PreferenceCategory>
 </PreferenceScreen>

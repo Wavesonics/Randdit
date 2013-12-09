@@ -12,6 +12,7 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.darkrockstudios.apps.randdit.R;
+import com.darkrockstudios.apps.randdit.misc.StatCounter;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -225,6 +226,9 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 			if( downloadedDrawable != null )
 			{
 				drawable = downloadedDrawable;
+
+				// This doesn't really belong here, but it's the best place I can think to put it for now
+				StatCounter.countImageView( m_context );
 			}
 		}
 

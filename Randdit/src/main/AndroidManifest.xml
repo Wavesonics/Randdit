@@ -4,7 +4,7 @@
           android:versionCode="3"
           android:versionName="0.03">
 
-<uses-sdk
+    <uses-sdk
         android:minSdkVersion="14"
         android:targetSdkVersion="19"/>
 
@@ -26,7 +26,9 @@
         android:theme="@style/AppTheme"
         android:largeHeap="true">
 
-        <meta-data android:name="com.google.android.backup.api_key" android:value="AEdPqrEAAAAI6DKu--811C4_BhM4qame1c55imFsdEMyIiBUAw" />
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAI6DKu--811C4_BhM4qame1c55imFsdEMyIiBUAw"/>
 
         <activity
             android:name="com.darkrockstudios.apps.randdit.MainActivity"
@@ -41,19 +43,20 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.CATEGORY_BROWSABLE"/>
 
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:host="randdit.com" />
-                <data android:pathPattern="/.*/.*" />
-                <data android:pathPattern="/.*/.*/.*" />
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+                <data android:host="randdit.com"/>
+                <data android:pathPattern="/.*/.*"/>
+                <data android:pathPattern="/.*/.*/.*"/>
             </intent-filter>
         </activity>
         <activity
             android:name="com.darkrockstudios.apps.randdit.SettingsActivity"
-            android:label="@string/title_settings">
+            android:label="@string/title_settings"
+            android:parentActivityName="com.darkrockstudios.apps.randdit.MainActivity">
         </activity>
 
         <service android:name=".DownloadService"/>

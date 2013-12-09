@@ -8,4 +8,7 @@
     <color name="primary">#0B2C3C</color>
     <color name="secondary">#1A4255</color>
     <color name="outline">#FFFFFF</color>
+
+    <color name="fading_edge_start">#EE666666</color>
+    <color name="fading_edge_end">#00666666</color>
 </resources>

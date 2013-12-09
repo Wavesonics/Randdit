@@ -1,6 +1,5 @@
 package com.darkrockstudios.apps.randdit;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
@@ -8,7 +7,6 @@ import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -17,17 +15,13 @@ import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.widget.DrawerLayout;
 import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -51,7 +45,7 @@ import org.json.JSONObject;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MainActivity extends Activity implements AdapterView.OnItemClickListener
+public class MainActivity extends NavDrawerActivity
 {
 	private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -60,11 +54,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	private static final String SAVE_POSTS    = MainActivity.class.getName() + ".POSTS";
 	private static final String SAVE_NAV_ITEM = MainActivity.class.getName() + ".NAV_ITEM";
 
-	private DrawerToggle m_drawerToggle;
-	private DrawerLayout m_drawerLayout;
-	private ListView     m_navDrawerView;
-
-	private NavDrawerAdapter m_navDrawerAdapter;
 	private LinkedList<Post> m_posts;
 
 	private NfcAdapter  m_nfcAdapter;
@@ -78,7 +67,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	protected void onCreate( final Bundle savedInstanceState )
 	{
 		super.onCreate( savedInstanceState );
-		requestWindowFeature( Window.FEATURE_INDETERMINATE_PROGRESS );
 
 		// Don't report starts during testing
 		if( BuildConfig.DEBUG )
@@ -86,11 +74,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 			GoogleAnalytics.getInstance( this ).setDryRun( true );
 		}
 
-		setContentView( R.layout.activity_main_simple );
-
 		PreferenceManager.setDefaultValues( this, R.xml.settings, false );
-
-		setupNavDrawer();
 
 		initNfc();
 
@@ -125,23 +109,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		{
 			requestPost( postId );
 		}
-	}
-
-	private void setupNavDrawer()
-	{
-		m_drawerLayout = (DrawerLayout) findViewById( R.id.drawer_layout );
-
-		m_drawerToggle =
-				new DrawerToggle( this, m_drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close );
-		m_drawerLayout.setDrawerListener( m_drawerToggle );
-
-		getActionBar().setDisplayHomeAsUpEnabled( true );
-		getActionBar().setHomeButtonEnabled( true );
-
-		m_navDrawerView = (ListView) findViewById( R.id.left_drawer );
-		m_navDrawerAdapter = new NavDrawerAdapter( this );
-		m_navDrawerView.setAdapter( m_navDrawerAdapter );
-		m_navDrawerView.setOnItemClickListener( this );
 	}
 
 	private String getPostFromIntent( final Intent intent )
@@ -185,21 +152,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	}
 
 	@Override
-	protected void onPostCreate( final Bundle savedInstanceState )
-	{
-		super.onPostCreate( savedInstanceState );
-		// Sync the toggle state after onRestoreInstanceState has occurred.
-		m_drawerToggle.syncState();
-	}
-
-	@Override
-	public void onConfigurationChanged( final Configuration newConfig )
-	{
-		super.onConfigurationChanged( newConfig );
-		m_drawerToggle.onConfigurationChanged( newConfig );
-	}
-
-	@Override
 	public boolean onCreateOptionsMenu( final Menu menu )
 	{
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -211,7 +163,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 	public boolean onOptionsItemSelected( final MenuItem item )
 	{
 		final boolean handled;
-		if( m_drawerToggle.onOptionsItemSelected( item ) )
+		if( super.onOptionsItemSelected( item ) )
 		{
 			handled = true;
 		}
@@ -387,12 +339,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 		Analytics.trackCategoryChange( this, m_currentCategory );
 	}
 
-	public void clearTitle()
-	{
-		String appName = getString( R.string.app_name );
-		getActionBar().setTitle( appName );
-	}
-
+	@Override
 	public void setTitle()
 	{
 		String appName = getString( R.string.app_name );
@@ -549,27 +496,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 			setProgressBarIndeterminateVisibility( false );
 			setNextImageButtonEnabled( true );
-		}
-	}
-
-	private class DrawerToggle extends ActionBarDrawerToggle
-	{
-		public DrawerToggle( final Activity activity, final DrawerLayout drawerLayout, final int drawerImageRes, final int openDrawerContentDescRes, final int closeDrawerContentDescRes )
-		{
-			super( activity, drawerLayout, drawerImageRes, openDrawerContentDescRes, closeDrawerContentDescRes );
-		}
-
-		public void onDrawerClosed( final View view )
-		{
-			setTitle();
-		}
-
-		/**
-		 * Called when a drawer has settled in a completely open state.
-		 */
-		public void onDrawerOpened( final View drawerView )
-		{
-			clearTitle();
 		}
 	}
 }
