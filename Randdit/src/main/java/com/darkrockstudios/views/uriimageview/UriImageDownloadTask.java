@@ -159,7 +159,7 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 			}
 			inputStream = new BufferedInputStream( urlConnection.getInputStream() );
 
-			final int BUF_SIZE = 1024 * 2;
+			final int BUF_SIZE = 1024;
 			final byte[] buffer = new byte[ BUF_SIZE ];
 
 			int bytesRead;
