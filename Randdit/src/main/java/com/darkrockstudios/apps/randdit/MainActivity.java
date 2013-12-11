@@ -461,8 +461,26 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	{
 		if( isPro )
 		{
-			Intent intent = new Intent( this, MainActivity.class );
-			startActivity( intent );
+			// If we are already viewing a post, we wan't to release while still viewing that post
+			Fragment fragment = getFragmentManager().findFragmentByTag( CONTENT_FRAGMENT_TAG );
+			if( fragment != null && fragment instanceof PostFragment )
+			{
+				PostFragment postFragment = (PostFragment) fragment;
+				Post currentPost = postFragment.getPost();
+
+				String url = PostFragment.createRandditUrl( currentPost, m_currentCategory );
+				Uri uri = Uri.parse( url );
+
+				Intent intent = new Intent( this, MainActivity.class );
+				intent.setAction( Intent.ACTION_VIEW );
+				intent.setData( uri );
+				startActivity( intent );
+			}
+			else
+			{
+				Intent intent = new Intent( this, MainActivity.class );
+				startActivity( intent );
+			}
 			finish();
 		}
 	}

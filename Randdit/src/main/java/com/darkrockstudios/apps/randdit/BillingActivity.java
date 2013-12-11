@@ -30,8 +30,8 @@ import java.util.ArrayList;
 public class BillingActivity extends Activity implements PurchaseProvider
 {
 	private static final String TAG             = BillingActivity.class.getSimpleName();
-	//private static final String PRODUCT_SKU_PRO = "randdit_pro";
-	private static final String PRODUCT_SKU_PRO = "android.test.purchased";
+	private static final String PRODUCT_SKU_PRO = "randdit_pro";
+	//private static final String PRODUCT_SKU_PRO = "android.test.purchased";
 
 	private boolean m_isPro;
 
@@ -68,7 +68,7 @@ public class BillingActivity extends Activity implements PurchaseProvider
 		}
 	}
 
-	public void setProStatusListener( ProStatusListener listener )
+	public void setProStatusListener( final ProStatusListener listener )
 	{
 		m_statusListener = listener;
 	}
@@ -240,7 +240,7 @@ public class BillingActivity extends Activity implements PurchaseProvider
 		return "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm81R0ci/UDjZfJ+2ySzwn7mbBhfnb0H5aQhcgOe90FKpNNNy7/FBmrkh1v3N7Iha/siI77tyJsevzpssqvUHkA24dJZ6tEe+lGc2b6aGRpkDNjQeLZsb93525LBDH7rFhhoI+tcqjfZ2D8dIvS273wfWA2I4YiEvfwwrrsZvb4AKHHmavW+zqZRSs7pD+Mm1X1VvSMmFyX+6e/O974ptkKzd111VeozV3pbIJZ3Rl6YeEHHS32YVlc4Ae9vP1W1P96ICpfOufyBO5e77O6sf7drTFHp45I9E0QGhEIwIT3VqeMiCmQU3iYSOMp3bgCLTOsDVeVuy7WHac46XzCFkPwIDAQAB";
 	}
 
-	private boolean verifyPurchase( String data, String signature )
+	private boolean verifyPurchase( final String data, final String signature )
 	{
 		return Security.verifyPurchase( assemblePublicKey(), data, signature );
 	}

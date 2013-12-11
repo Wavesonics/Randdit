@@ -47,6 +47,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	private static final String TAG = PostFragment.class.getSimpleName();
 
 	private static final boolean IS_API_17_OR_LATER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1;
+	private static final boolean IS_API_18_OR_LATER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
 
 	private static final String FRAGMENT_TAG_POST_INFO = "PostInfoFragment";
 
@@ -84,7 +85,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	}
 
 	@Override
-	public void onAttach( Activity activity )
+	public void onAttach( final Activity activity )
 	{
 		super.onAttach( activity );
 
@@ -341,9 +342,14 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		}
 	}
 
+	public Post getPost()
+	{
+		return m_post;
+	}
+
 	private boolean shouldDissmissUi()
 	{
-		return !m_isTabletLayout;
+		return !m_isTabletLayout && IS_API_18_OR_LATER;
 	}
 
 	@Override
