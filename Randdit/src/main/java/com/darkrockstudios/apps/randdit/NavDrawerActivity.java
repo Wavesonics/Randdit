@@ -16,7 +16,7 @@ import com.darkrockstudios.apps.randdit.misc.NavDrawerAdapter;
 /**
  * Created by Adam on 12/8/13.
  */
-public abstract class NavDrawerActivity extends Activity implements AdapterView.OnItemClickListener
+public abstract class NavDrawerActivity extends BillingActivity implements AdapterView.OnItemClickListener
 {
 	protected DrawerToggle     m_drawerToggle;
 	protected DrawerLayout     m_drawerLayout;

@@ -29,11 +29,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.darkrockstudios.apps.randdit.fragments.IntroFragment;
 import com.darkrockstudios.apps.randdit.fragments.PostFragment;
+import com.darkrockstudios.apps.randdit.fragments.PurchaseProFragment;
 import com.darkrockstudios.apps.randdit.misc.Analytics;
 import com.darkrockstudios.apps.randdit.misc.NavDrawerAdapter;
 import com.darkrockstudios.apps.randdit.misc.NextButtonEnabler;
 import com.darkrockstudios.apps.randdit.misc.Post;
 import com.darkrockstudios.apps.randdit.misc.Preferences;
+import com.darkrockstudios.apps.randdit.misc.PurchaseScreenProvider;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.gson.Gson;
@@ -45,11 +47,12 @@ import org.json.JSONObject;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MainActivity extends NavDrawerActivity
+public class MainActivity extends NavDrawerActivity implements BillingActivity.ProStatusListener, PurchaseScreenProvider
 {
 	private static final String TAG = MainActivity.class.getSimpleName();
 
-	private static final String CONTENT_FRAGMENT_TAG = "ContentFragment";
+	private static final String CONTENT_FRAGMENT_TAG  = "ContentFragment";
+	private static final String PURCHASE_FRAGMENT_TAG = "PurchaseFragment";
 
 	private static final String SAVE_POSTS    = MainActivity.class.getName() + ".POSTS";
 	private static final String SAVE_NAV_ITEM = MainActivity.class.getName() + ".NAV_ITEM";
@@ -64,8 +67,18 @@ public class MainActivity extends NavDrawerActivity
 	private boolean m_isActive;
 
 	@Override
+	public void showPurchaseScreen()
+	{
+		FragmentManager fragmentManager = getFragmentManager();
+		PurchaseProFragment fragment = PurchaseProFragment.newInstance();
+		fragment.show( fragmentManager, PURCHASE_FRAGMENT_TAG );
+	}
+
+	@Override
 	protected void onCreate( final Bundle savedInstanceState )
 	{
+		setProStatusListener( this );
+
 		super.onCreate( savedInstanceState );
 
 		// Don't report starts during testing
@@ -151,8 +164,15 @@ public class MainActivity extends NavDrawerActivity
 	@Override
 	public boolean onCreateOptionsMenu( final Menu menu )
 	{
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate( R.menu.main, menu );
+		if( isPro() )
+		{
+			getMenuInflater().inflate( R.menu.main_pro, menu );
+		}
+		else
+		{
+			getMenuInflater().inflate( R.menu.main, menu );
+		}
+
 		return true;
 	}
 
@@ -180,6 +200,12 @@ public class MainActivity extends NavDrawerActivity
 			{
 				Analytics.trackShare( this, m_currentCategory );
 				handled = super.onOptionsItemSelected( item );
+			}
+			else if( id == R.id.action_purchase_pro )
+			{
+				showPurchaseScreen();
+
+				handled = true;
 			}
 			else
 			{
@@ -313,7 +339,7 @@ public class MainActivity extends NavDrawerActivity
 			{
 				FragmentManager fragmentManager = getFragmentManager();
 
-				PostFragment fragment = PostFragment.newInstance( post, m_currentCategory );
+				PostFragment fragment = PostFragment.newInstance( post, isPro(), m_currentCategory );
 				fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
 
 				updateNfcMessage( post );
@@ -428,6 +454,17 @@ public class MainActivity extends NavDrawerActivity
 		}
 
 		return shouldShow;
+	}
+
+	@Override
+	public void onProStatusUpdate( final boolean isPro )
+	{
+		if( isPro )
+		{
+			Intent intent = new Intent( this, MainActivity.class );
+			startActivity( intent );
+			finish();
+		}
 	}
 
 	private class WifiDialogListener implements Dialog.OnClickListener

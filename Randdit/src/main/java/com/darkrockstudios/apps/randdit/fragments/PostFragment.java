@@ -25,15 +25,19 @@ import android.widget.TextView;
 import com.darkrockstudios.apps.randdit.DownloadService;
 import com.darkrockstudios.apps.randdit.R;
 import com.darkrockstudios.apps.randdit.RandditApplication;
+import com.darkrockstudios.apps.randdit.misc.AdRequestBuilder;
 import com.darkrockstudios.apps.randdit.misc.Analytics;
 import com.darkrockstudios.apps.randdit.misc.NavDrawerAdapter;
 import com.darkrockstudios.apps.randdit.misc.NextButtonEnabler;
 import com.darkrockstudios.apps.randdit.misc.Post;
+import com.darkrockstudios.apps.randdit.misc.PurchaseScreenProvider;
 import com.darkrockstudios.views.uriimageview.UriImageHandler;
 import com.darkrockstudios.views.uriimageview.UriImageView;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 /**
  * Created by Adam on 11/22/13.
@@ -46,32 +50,48 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 
 	private static final String FRAGMENT_TAG_POST_INFO = "PostInfoFragment";
 
-	private static final String ARG_POST = PostFragment.class.getName() + ".POST";
+	private static final String ARG_PRO      = PostFragment.class.getName() + ".PRO";
+	private static final String ARG_POST     = PostFragment.class.getName() + ".POST";
 	private static final String ARG_CATEGORY = PostFragment.class.getName() + ".CATEGORY";
 
-	private Post            m_post;
+	private boolean                  m_isPro;
+	private Post                     m_post;
 	private NavDrawerAdapter.NavItem m_category;
-	private TextView        m_titleView;
-	private View            m_toolBarView;
-	private UriImageView    m_imageView;
-	private Button          m_nextPostButton;
-	private UriImageHandler m_imageHandler;
+	private TextView                 m_titleView;
+	private View                     m_toolBarView;
+	private UriImageView             m_imageView;
+	private Button                   m_nextPostButton;
+	private UriImageHandler          m_imageHandler;
+
+	private PurchaseScreenProvider m_purchaseScreenProvider;
 
 	private ShareActionProvider m_shareActionProvider;
 	private AlertDialog         m_titleDialog;
 
 	private boolean m_isTabletLayout;
 
-	public static PostFragment newInstance( final Post post, final NavDrawerAdapter.NavItem category )
+	public static PostFragment newInstance( final Post post, final boolean isPro, final NavDrawerAdapter.NavItem category )
 	{
 		PostFragment fragment = new PostFragment();
 
 		Bundle args = new Bundle();
+		args.putBoolean( ARG_PRO, isPro );
 		args.putSerializable( ARG_POST, post );
 		args.putSerializable( ARG_CATEGORY, category );
 		fragment.setArguments( args );
 
 		return fragment;
+	}
+
+	@Override
+	public void onAttach( Activity activity )
+	{
+		super.onAttach( activity );
+
+		if( activity instanceof PurchaseScreenProvider )
+		{
+			m_purchaseScreenProvider = (PurchaseScreenProvider) activity;
+		}
 	}
 
 	@Override
@@ -85,6 +105,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		Bundle args = getArguments();
 		if( args != null )
 		{
+			m_isPro = args.getBoolean( ARG_PRO );
 			m_post = (Post) args.getSerializable( ARG_POST );
 			m_category = (NavDrawerAdapter.NavItem) args.getSerializable( ARG_CATEGORY );
 		}
@@ -123,7 +144,15 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	@Override
 	public View onCreateView( final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState )
 	{
-		View view = inflater.inflate( R.layout.post_fragment, container, false );
+		final View view;
+		if( m_isPro )
+		{
+			view = inflater.inflate( R.layout.post_pro_fragment, container, false );
+		}
+		else
+		{
+			view = inflater.inflate( R.layout.post_fragment, container, false );
+		}
 
 		Uri uri = Uri.parse( m_post.url );
 
@@ -148,12 +177,19 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 
 		m_nextPostButton = (Button) view.findViewById( R.id.POST_load_image_button );
 
+		AdView adView = (AdView) view.findViewById( R.id.POST_ad_view );
+		if( adView != null )
+		{
+			AdRequest adRequest = AdRequestBuilder.buildRequest();
+			adView.loadAd( adRequest );
+		}
+
 		return view;
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 	@Override
-	public void onViewCreated( View view, Bundle savedInstanceState )
+	public void onViewCreated( final View view, final Bundle savedInstanceState )
 	{
 		super.onViewCreated( view, savedInstanceState );
 
@@ -179,7 +215,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	{
 		super.onCreateOptionsMenu( menu, inflater );
 
-		inflater.inflate( R.menu.post_menu, menu );
+		inflater.inflate( R.menu.post, menu );
 
 		// Locate MenuItem with ShareActionProvider
 		MenuItem item = menu.findItem( R.id.menu_item_share );
@@ -217,13 +253,20 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 			{
 				if( activity != null && isAdded() )
 				{
-					Uri uri = Uri.parse( m_post.url );
-					Intent intent = new Intent( activity, DownloadService.class );
-					intent.setData( uri );
-					intent.putExtra( DownloadService.EXTRA_SET_WALLPAPER, true );
-					activity.startService( intent );
+					if( m_isPro )
+					{
+						Uri uri = Uri.parse( m_post.url );
+						Intent intent = new Intent( activity, DownloadService.class );
+						intent.setData( uri );
+						intent.putExtra( DownloadService.EXTRA_SET_WALLPAPER, true );
+						activity.startService( intent );
 
-					Analytics.trackWallpaper( activity, m_category );
+						Analytics.trackWallpaper( activity, m_category );
+					}
+					else if( m_purchaseScreenProvider != null )
+					{
+						m_purchaseScreenProvider.showPurchaseScreen();
+					}
 				}
 				handled = true;
 			}
@@ -236,7 +279,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		return handled;
 	}
 
-	public static String createRandditUrl( final Post post, NavDrawerAdapter.NavItem category )
+	public static String createRandditUrl( final Post post, final NavDrawerAdapter.NavItem category )
 	{
 		String randditBase = "http://randdit.com/";
 		String categoryStr = NavDrawerAdapter.getId( category );
@@ -268,6 +311,8 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	public void onDetach()
 	{
 		super.onDetach();
+
+		m_purchaseScreenProvider = null;
 
 		if( m_titleDialog != null )
 		{

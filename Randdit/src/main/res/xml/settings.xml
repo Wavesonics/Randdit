@@ -16,6 +16,7 @@
             android:defaultValue="false"/>
 
     </PreferenceCategory>
+
     <PreferenceCategory
         android:title="@string/pref_stats_title"
         android:key="pref_key_storage_stats">

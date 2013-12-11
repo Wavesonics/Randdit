@@ -6,14 +6,14 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_share"
         android:actionProviderClass=
-            "android.widget.ShareActionProvider" />
+            "android.widget.ShareActionProvider"/>
     <item
         android:id="@+id/menu_item_download"
         android:icon="@drawable/ic_action_download"
-        android:title="@string/menu_download" />
+        android:title="@string/menu_download"/>
 
     <item
         android:id="@+id/menu_item_wallpaper"
         android:icon="@drawable/ic_action_picture"
-        android:title="@string/menu_wallpaper" />
+        android:title="@string/menu_wallpaper"/>
 </menu>
