@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="oval">
+
+    <size
+        android:height="@dimen/pro_bullet_point"
+        android:width="@dimen/pro_bullet_point"/>
+    <solid android:color="@color/accent"/>
+</shape>

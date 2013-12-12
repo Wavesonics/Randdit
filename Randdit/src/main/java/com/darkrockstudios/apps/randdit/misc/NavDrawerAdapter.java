@@ -23,64 +23,134 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
 		cute,
 		beautiful,
 		gifs,
-		wtf
+		wtf,
+		pro
 	}
 
-	public NavDrawerAdapter( Context context )
+	private static final int TYPE_CATEGORY = 0;
+	private static final int TYPE_PRO_AD   = 1;
+	private static final int TYPE_COUNT    = 2;
+
+	private boolean m_isPro;
+
+	public NavDrawerAdapter( final Context context )
 	{
 		super( context, android.R.layout.simple_list_item_1 );
 
-        refreshNavItems();
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( context );
+		m_isPro = settings.getBoolean( Preferences.KEY_IS_PRO, false );
+		;
+
+		refreshNavItems();
 	}
 
-    public void refreshNavItems()
-    {
-        clear();
+	public void setPro( final boolean isPro )
+	{
+		m_isPro = isPro;
+	}
 
-        add( NavItem.all );
-        add( NavItem.new_ );
-        add( NavItem.funny );
-        add( NavItem.cute );
-        add( NavItem.beautiful );
-        add( NavItem.gifs );
-        if( wtfEnabled() )
-        {
-            add( NavItem.wtf );
-        }
-    }
+	public void refreshNavItems()
+	{
+		clear();
 
-    private boolean wtfEnabled()
-    {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext());
-        return settings.getBoolean( Preferences.KEY_SHOW_WTF, false );
-    }
+		add( NavItem.all );
+		add( NavItem.new_ );
+		add( NavItem.funny );
+		add( NavItem.cute );
+		add( NavItem.beautiful );
+		add( NavItem.gifs );
+		if( wtfEnabled() )
+		{
+			add( NavItem.wtf );
+		}
+
+		if( !m_isPro )
+		{
+			add( NavItem.pro );
+		}
+	}
+
+	private boolean wtfEnabled()
+	{
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( getContext() );
+		return settings.getBoolean( Preferences.KEY_SHOW_WTF, false );
+	}
 
 	@Override
-	public View getView (int position, View convertView, ViewGroup parent)
+	public int getViewTypeCount()
 	{
+		return TYPE_COUNT;
+	}
+
+	@Override
+	public int getItemViewType( final int position )
+	{
+		final int type;
+
+		if( !m_isPro && position == getCount() - 1 )
+		{
+			type = TYPE_PRO_AD;
+		}
+		else
+		{
+			type = TYPE_CATEGORY;
+		}
+
+		return type;
+	}
+
+	@Override
+	public View getView( final int position, final View convertView, final ViewGroup parent )
+	{
+		final int type = getItemViewType( position );
+
 		final View view;
 		if( convertView == null )
 		{
 			LayoutInflater inflater = LayoutInflater.from( getContext() );
-			view = inflater.inflate( android.R.layout.simple_list_item_1, parent, false );
+			switch( type )
+			{
+				case TYPE_CATEGORY:
+					view = inflater.inflate( android.R.layout.simple_list_item_1, parent, false );
+					break;
+				case TYPE_PRO_AD:
+				default:
+					view = inflater.inflate( android.R.layout.simple_list_item_2, parent, false );
+					break;
+			}
+
 		}
 		else
 		{
 			view = convertView;
 		}
 
-		String title = getId( getItem( position ) );
-		if( title != null )
+		switch( type )
 		{
-			TextView titleView = (TextView) view.findViewById( android.R.id.text1 );
-			titleView.setTextColor( Color.WHITE );
-			titleView.setText( title );
+			case TYPE_CATEGORY:
+				String title = getId( getItem( position ) );
+				if( title != null )
+				{
+					TextView titleView = (TextView) view.findViewById( android.R.id.text1 );
+					titleView.setTextColor( Color.WHITE );
+					titleView.setText( title );
+				}
+				break;
+			case TYPE_PRO_AD:
+				TextView titleView = (TextView) view.findViewById( android.R.id.text1 );
+				titleView.setTextColor( Color.WHITE );
+				titleView.setText( "Go Pro" );
+
+				TextView subtitleView = (TextView) view.findViewById( android.R.id.text2 );
+				subtitleView.setTextColor( Color.WHITE );
+				subtitleView.setText( "Remove Ads!" );
+				break;
 		}
 
 		return view;
 	}
 
-	public static String getId( NavItem item )
+	public static String getId( final NavItem item )
 	{
 		final String title;
 

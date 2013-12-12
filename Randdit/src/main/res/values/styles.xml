@@ -4,6 +4,7 @@
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/RandditActionBar</item>
         <item name="android:buttonStyle">@style/RandditButton</item>
+        <item name="android:dialogTheme">@style/RandditDialog</item>
     </style>
 
     <style name="RandditActionBar" parent="android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
@@ -16,6 +17,16 @@
         <item name="android:padding">@dimen/button_padding</item>
         <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="RandditDialog" parent="@android:style/Theme.Holo.Dialog">
+        <item name="android:buttonStyle">@style/RandditButton</item>
+        <item name="android:windowTitleStyle">@style/RandditDialogTitle</item>
+    </style>
+
+    <style name="RandditDialogTitle">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">36sp</item>
     </style>
 
 </resources>

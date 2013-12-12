@@ -38,9 +38,9 @@
 
     <string name="PRO_title">Purchase Pro</string>
     <string name="PRO_header">Why go Pro?</string>
-    <string name="PRO_point_1">- No Ads! That means more screen space for Doge!</string>
-    <string name="PRO_point_2">- Set images as your Wallpaper directly from Randdit</string>
-    <string name="PRO_point_3">- Option to disable the Randdit text when sharing links</string>
-    <string name="PRO_point_4">- Buy me beer!</string>
+    <string name="PRO_point_1">No Ads! That means more screen space for Doge!</string>
+    <string name="PRO_point_2">Set images as your Wallpaper directly from Randdit</string>
+    <string name="PRO_point_3">Option to disable the Randdit text when sharing links</string>
+    <string name="PRO_point_4">Buy me beer!</string>
 
 </resources>

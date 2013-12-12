@@ -354,12 +354,21 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	@Override
 	public void onItemClick( final AdapterView<?> parent, final View view, final int position, final long id )
 	{
-		m_currentCategory = m_navDrawerAdapter.getItem( position );
-		m_posts.clear();
-		requestPosts();
-		m_drawerLayout.closeDrawer( m_navDrawerView );
+		NavDrawerAdapter.NavItem navItem = m_navDrawerAdapter.getItem( position );
+		if( navItem != NavDrawerAdapter.NavItem.pro )
+		{
+			m_currentCategory = navItem;
+			m_posts.clear();
+			requestPosts();
 
-		Analytics.trackCategoryChange( this, m_currentCategory );
+			Analytics.trackCategoryChange( this, m_currentCategory );
+		}
+		else
+		{
+			showPurchaseScreen();
+		}
+
+		m_drawerLayout.closeDrawer( m_navDrawerView );
 	}
 
 	@Override
@@ -459,6 +468,9 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	@Override
 	public void onProStatusUpdate( final boolean isPro )
 	{
+		m_navDrawerAdapter.setPro( isPro() );
+		m_navDrawerAdapter.refreshNavItems();
+
 		if( isPro )
 		{
 			// If we are already viewing a post, we wan't to release while still viewing that post
