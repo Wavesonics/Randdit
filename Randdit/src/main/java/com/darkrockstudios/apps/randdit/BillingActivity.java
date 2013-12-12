@@ -82,6 +82,11 @@ public class BillingActivity extends Activity implements PurchaseProvider
 		m_isPro = settings.getBoolean( Preferences.KEY_IS_PRO, false );
 
 		m_serviceConn = new BillingServiceConnection();
+		connectToService();
+	}
+
+	private void connectToService()
+	{
 		bindService( new Intent( "com.android.vending.billing.InAppBillingService.BIND" ),
 		             m_serviceConn, Context.BIND_AUTO_CREATE );
 	}
@@ -170,25 +175,29 @@ public class BillingActivity extends Activity implements PurchaseProvider
 	@Override
 	public void purchasePro()
 	{
-		try
+		if( m_service != null )
 		{
-			Bundle buyIntentBundle = m_service.getBuyIntent( 3, getPackageName(), PRODUCT_SKU_PRO, "inapp", "empty_payload" );
-
-			int responseCode = buyIntentBundle.getInt( "RESPONSE_CODE", 0 );
-			if( responseCode == 0 )
+			try
 			{
-				PendingIntent pendingIntent = buyIntentBundle.getParcelable( "BUY_INTENT" );
+				Bundle buyIntentBundle =
+						m_service.getBuyIntent( 3, getPackageName(), PRODUCT_SKU_PRO, "inapp", "empty_payload" );
 
-				startIntentSenderForResult( pendingIntent.getIntentSender(),
-				                            1001, new Intent(),
-				                            Integer.valueOf( 0 ),
-				                            Integer.valueOf( 0 ),
-				                            Integer.valueOf( 0 ) );
+				int responseCode = buyIntentBundle.getInt( "RESPONSE_CODE", 0 );
+				if( responseCode == 0 )
+				{
+					PendingIntent pendingIntent = buyIntentBundle.getParcelable( "BUY_INTENT" );
+
+					startIntentSenderForResult( pendingIntent.getIntentSender(),
+					                            1001, new Intent(),
+					                            Integer.valueOf( 0 ),
+					                            Integer.valueOf( 0 ),
+					                            Integer.valueOf( 0 ) );
+				}
 			}
-		}
-		catch( RemoteException | IntentSender.SendIntentException e )
-		{
-			e.printStackTrace();
+			catch( RemoteException | IntentSender.SendIntentException e )
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 

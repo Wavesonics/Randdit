@@ -63,6 +63,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	private UriImageView             m_imageView;
 	private Button                   m_nextPostButton;
 	private UriImageHandler          m_imageHandler;
+	private AdView m_adView;
 
 	private PurchaseScreenProvider m_purchaseScreenProvider;
 
@@ -124,6 +125,11 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		super.onResume();
 
 		m_imageHandler.onResume( (UriImageView) getView().findViewById( R.id.POST_imageview ) );
+
+		if( m_adView != null )
+		{
+			m_adView.resume();
+		}
 	}
 
 	@Override
@@ -132,6 +138,11 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		super.onPause();
 
 		m_imageHandler.onPause();
+
+		if( m_adView != null )
+		{
+			m_adView.pause();
+		}
 	}
 
 	@Override
@@ -140,6 +151,11 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		super.onDestroy();
 
 		m_imageHandler.cancelDownload();
+
+		if( m_adView != null )
+		{
+			m_adView.destroy();
+		}
 	}
 
 	@Override
@@ -178,11 +194,11 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 
 		m_nextPostButton = (Button) view.findViewById( R.id.POST_load_image_button );
 
-		AdView adView = (AdView) view.findViewById( R.id.POST_ad_view );
-		if( adView != null )
+		m_adView = (AdView) view.findViewById( R.id.POST_ad_view );
+		if( m_adView != null )
 		{
 			AdRequest adRequest = AdRequestBuilder.buildRequest();
-			adView.loadAd( adRequest );
+			m_adView.loadAd( adRequest );
 		}
 
 		return view;
