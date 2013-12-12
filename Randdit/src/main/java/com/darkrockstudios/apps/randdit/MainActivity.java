@@ -468,8 +468,15 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	@Override
 	public void onProStatusUpdate( final boolean isPro )
 	{
-		m_navDrawerAdapter.setPro( isPro() );
-		m_navDrawerAdapter.refreshNavItems();
+		runOnUiThread( new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				m_navDrawerAdapter.setPro( isPro() );
+				m_navDrawerAdapter.refreshNavItems();
+			}
+		} );
 
 		if( isPro )
 		{
