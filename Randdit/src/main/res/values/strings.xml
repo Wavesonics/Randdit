@@ -33,7 +33,6 @@
     <string name="postinfo_title">Post Info</string>
     <string name="postinfo_user">User: </string>
     <string name="postinfo_created">Created: </string>
-    <string name="postinfo_from">from /r/%1$s</string>
     <string name="postinfo_no_creation_date">unknown</string>
     <string name="MENU_purchase_pro">Go Pro!</string>
 

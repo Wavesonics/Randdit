@@ -20,7 +20,8 @@ import java.util.Date;
  */
 public class PostInfoFragment extends DialogFragment
 {
-	private static final String ARG_POST = "POST";
+	private static final String ARG_POST        = "POST";
+	private static final String REDDIT_BASE_URL = "http://reddit.com";
 
 	private Post m_post;
 
@@ -65,8 +66,8 @@ public class PostInfoFragment extends DialogFragment
 			TextView createdDateView = (TextView) view.findViewById( R.id.POSTINFO_created );
 			createdDateView.setText( parseDate( m_post.created ) );
 
-			TextView subredditView = (TextView) view.findViewById( R.id.POSTINFO_subreddit );
-			subredditView.setText( getString( R.string.postinfo_from, m_post.subreddit ) );
+			TextView permalinkView = (TextView) view.findViewById( R.id.POSTINFO_permalink );
+			permalinkView.setText( REDDIT_BASE_URL + m_post.permalink );
 		}
 
 		Dialog dialog = getDialog();
