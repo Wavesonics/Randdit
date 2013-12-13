@@ -47,6 +47,9 @@ import org.json.JSONObject;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
+
 public class MainActivity extends NavDrawerActivity implements BillingActivity.ProStatusListener, PurchaseScreenProvider
 {
 	private static final String TAG = MainActivity.class.getSimpleName();
@@ -558,6 +561,8 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		{
 			Log.d( TAG, "Failed to retrieve posts." );
 			Log.d( TAG, volleyError.toString() );
+
+			Crouton.makeText( MainActivity.this, R.string.toast_post_request_error, Style.ALERT ).show();
 
 			setProgressBarIndeterminateVisibility( false );
 			setNextImageButtonEnabled( true );

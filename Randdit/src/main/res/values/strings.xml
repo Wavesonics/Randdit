@@ -17,6 +17,8 @@
     <string name="pref_stats_title">Stats</string>
     <string name="pref_image_views_title">Images Viewed</string>
 
+    <string name="toast_post_request_error">Failed to retrieve posts</string>
+
     <string name="intro_1">1. See those categories over in the Nav Drawer? Click on those to get interesting images in the category you want to see</string>
     <string name="intro_2">2. Click "Show me another image!" at the bottom to see more!</string>
     <string name="intro_3">3. Become the person who always shows their friends the funniest stuff!</string>
