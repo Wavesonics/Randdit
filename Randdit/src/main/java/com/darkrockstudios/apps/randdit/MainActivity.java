@@ -87,7 +87,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			GoogleAnalytics.getInstance( this ).setDryRun( true );
 		}
 
-		PreferenceManager.setDefaultValues( this, R.xml.settings, false );
+		PreferenceManager.setDefaultValues( this, R.xml.settings_pro, false );
 
 		initNfc();
 

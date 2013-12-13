@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.view.MenuItem;
 
 import com.darkrockstudios.apps.randdit.fragments.SettingsFragment;
+import com.darkrockstudios.apps.randdit.misc.Preferences;
 
 /**
  * Created by Adam on 11/23/13.
@@ -15,6 +16,8 @@ import com.darkrockstudios.apps.randdit.fragments.SettingsFragment;
 public class SettingsActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener
 {
 	private static final String TAG = SettingsActivity.class.getSimpleName();
+
+	private boolean m_isPro;
 
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
@@ -24,9 +27,12 @@ public class SettingsActivity extends Activity implements SharedPreferences.OnSh
 		getActionBar().setDisplayHomeAsUpEnabled( true );
 		getActionBar().setHomeButtonEnabled( true );
 
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( this );
+		m_isPro = settings.getBoolean( Preferences.KEY_IS_PRO, false );
+
 		// Display the fragment as the main content.
 		getFragmentManager().beginTransaction()
-				.replace( android.R.id.content, new SettingsFragment() )
+				.replace( android.R.id.content, SettingsFragment.newInstance( m_isPro ) )
 				.commit();
 	}
 

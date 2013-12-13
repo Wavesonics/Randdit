@@ -7,9 +7,11 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,6 +32,7 @@ import com.darkrockstudios.apps.randdit.misc.Analytics;
 import com.darkrockstudios.apps.randdit.misc.NavDrawerAdapter;
 import com.darkrockstudios.apps.randdit.misc.NextButtonEnabler;
 import com.darkrockstudios.apps.randdit.misc.Post;
+import com.darkrockstudios.apps.randdit.misc.Preferences;
 import com.darkrockstudios.apps.randdit.misc.PurchaseScreenProvider;
 import com.darkrockstudios.views.uriimageview.UriImageHandler;
 import com.darkrockstudios.views.uriimageview.UriImageView;
@@ -305,7 +308,20 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	{
 		Intent intent = new Intent( Intent.ACTION_SEND );
 		intent.setData( Uri.parse( post.url ) );
-		String shareBody = getString( R.string.share_body, Html.fromHtml( post.title ), createRandditUrl( post, m_category ) );
+
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( getActivity() );
+		boolean appendAd = settings.getBoolean( Preferences.KEY_APPEND_AD, true );
+		final int shareBodyResource;
+		if( appendAd )
+		{
+			shareBodyResource = R.string.share_body;
+		}
+		else
+		{
+			shareBodyResource = R.string.share_body_no_ad;
+		}
+
+		String shareBody = getString( shareBodyResource, Html.fromHtml( post.title ), createRandditUrl( post, m_category ) );
 		intent.putExtra( Intent.EXTRA_TEXT, shareBody );
 		intent.setType( "image/*" );
 

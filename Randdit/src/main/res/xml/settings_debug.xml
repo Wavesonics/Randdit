@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/pref_general_title"
+        android:key="pref_key_storage_settings">
+        <CheckBoxPreference
+            android:key="pref_key_keep_screen_on"
+            android:summary="@string/pref_summary_keep_screen_on"
+            android:title="@string/pref_title_keep_screen_on"
+            android:defaultValue="true"/>
+        <CheckBoxPreference
+            android:key="pref_key_show_wtf"
+            android:summary="@string/pref_summary_show_wtf"
+            android:title="@string/pref_title_show_wtf"
+            android:defaultValue="false"/>
+        <CheckBoxPreference
+            android:key="pref_key_append_ad"
+            android:summary="@string/pref_summary_append_ad"
+            android:title="@string/pref_title_append_ad"
+            android:defaultValue="true"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_stats_title"
+        android:key="pref_key_storage_stats">
+        <com.darkrockstudios.apps.randdit.misc.StatsPreference
+            android:title="@string/pref_image_views_title"
+            android:key="pref_key_image_views"
+            android:defaultValue="0"
+            android:enabled="false"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Debug"
+        android:key="pref_key_storage_debug">
+        <CheckBoxPreference
+            android:key="pref_key_is_pro"
+            android:summary="Requires app restart to take effect"
+            android:title="Pro Mode"
+            android:defaultValue="false"/>
+    </PreferenceCategory>
+</PreferenceScreen>

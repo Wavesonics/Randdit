@@ -12,7 +12,8 @@
     <string name="pref_summary_keep_screen_on">Prevent the screen from turning off while using Randdit</string>
     <string name="pref_title_show_wtf">Show the WTF category</string>
     <string name="pref_summary_show_wtf">The WTF category contains NSFW and adult material, by showing it you agree to see some weird shit</string>
-
+    <string name="pref_title_append_ad">Append Randdit to shares</string>
+    <string name="pref_summary_append_ad">Append the Randdit to share text</string>
     <string name="pref_stats_title">Stats</string>
     <string name="pref_image_views_title">Images Viewed</string>
 
@@ -25,6 +26,7 @@
     <string name="menu_wallpaper">Set as wallpaper</string>
 
     <string name="share_body">%1$s - %2$s - via Randdit Android</string>
+    <string name="share_body_no_ad">%1$s - %2$s</string>
     <string name="toast_download_finished">Download finished</string>
     <string name="toast_download_started">Download started</string>
     <string name="toast_wallpaper_failed">Failed to set wallpaper</string>
