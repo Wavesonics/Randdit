@@ -9,6 +9,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/default_padding"
+        android:layout_marginBottom="@dimen/default_padding"
         android:textStyle="italic"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/PRO_header"/>
@@ -17,40 +19,45 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_margin="@dimen/default_margin"
+        android:layout_margin="@dimen/pro_text_margins"
         android:drawablePadding="@dimen/default_padding"
         android:drawableLeft="@drawable/bullet_point"
-        android:text="@string/PRO_point_1"
-        android:layout_marginTop="@dimen/default_padding"/>
+        android:text="@string/PRO_point_1"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_margin="@dimen/default_margin"
+        android:layout_margin="@dimen/pro_text_margins"
         android:drawablePadding="@dimen/default_padding"
         android:drawableLeft="@drawable/bullet_point"
-        android:text="@string/PRO_point_2"
-        android:id="@+id/textView"
-        android:layout_marginTop="@dimen/default_padding"/>
+        android:text="@string/PRO_point_2"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_margin="@dimen/default_margin"
+        android:layout_margin="@dimen/pro_text_margins"
         android:drawablePadding="@dimen/default_padding"
         android:drawableLeft="@drawable/bullet_point"
         android:text="@string/PRO_point_3"
-        android:id="@+id/textView2"
+        android:layout_marginTop="@dimen/default_padding"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_margin="@dimen/pro_text_margins"
+        android:drawablePadding="@dimen/default_padding"
+        android:drawableLeft="@drawable/bullet_point"
+        android:text="@string/PRO_point_4"
         android:layout_marginTop="@dimen/default_padding"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Purchase Pro Now!"
+        android:text="@string/PRO_purchase_button"
         android:id="@+id/PRO_purchase_button"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/default_padding"
-        />
+        android:layout_marginTop="@dimen/default_padding"/>
 </LinearLayout>

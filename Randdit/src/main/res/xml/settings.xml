@@ -14,6 +14,12 @@
             android:summary="@string/pref_summary_show_wtf"
             android:title="@string/pref_title_show_wtf"
             android:defaultValue="false"/>
+        <CheckBoxPreference
+            android:key="pref_key_append_ad"
+            android:summary="@string/pref_summary_append_ad"
+            android:title="@string/pref_title_append_ad"
+            android:defaultValue="true"
+            android:enabled="false"/>
 
     </PreferenceCategory>
 

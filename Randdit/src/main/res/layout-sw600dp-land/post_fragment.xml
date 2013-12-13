@@ -5,9 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_height="match_parent"
-    android:layout_width="match_parent"
-    android:divider="@drawable/fading_edge_vertical"
-    android:showDividers="middle">
+    android:layout_width="match_parent">
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/POST_ad_view"
@@ -25,7 +23,7 @@
         android:showDividers="middle"
         android:baselineAligned="false">
 
-    <FrameLayout
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1">

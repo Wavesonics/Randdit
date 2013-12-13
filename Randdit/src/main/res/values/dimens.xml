@@ -24,6 +24,7 @@
     <dimen name="fading_edge">4dp</dimen>
 
     <dimen name="pro_bullet_point">8dp</dimen>
+    <dimen name="pro_text_margins">8dp</dimen>
 
     <dimen name="nav_drawer_divider_size">1dp</dimen>
 
