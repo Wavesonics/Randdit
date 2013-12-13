@@ -19,6 +19,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ShareActionProvider;
@@ -42,12 +44,13 @@ import com.google.android.gms.ads.AdView;
 /**
  * Created by Adam on 11/22/13.
  */
-public class PostFragment extends Fragment implements View.OnClickListener, NextButtonEnabler, UriImageView.ImageZoomListener
+public class PostFragment extends Fragment implements View.OnClickListener, NextButtonEnabler, UriImageView.ImageZoomListener, View.OnSystemUiVisibilityChangeListener
 {
 	private static final String TAG = PostFragment.class.getSimpleName();
 
 	private static final boolean IS_API_17_OR_LATER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1;
 	private static final boolean IS_API_18_OR_LATER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
+	private static final boolean IS_API_19_OR_LATER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
 	private static final String FRAGMENT_TAG_POST_INFO = "PostInfoFragment";
 
@@ -115,6 +118,13 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		m_imageHandler = new UriImageHandler();
 
 		Analytics.trackScreen( getActivity(), PostFragment.class.getSimpleName(), m_isPro );
+
+		Activity activity = getActivity();
+		if( activity != null )
+		{
+			View decorView = activity.getWindow().getDecorView();
+			decorView.setOnSystemUiVisibilityChangeListener( this );
+		}
 	}
 
 	@Override
@@ -250,6 +260,22 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 
 		switch( item.getItemId() )
 		{
+			case R.id.menu_item_fullscreen:
+			{
+				if( activity != null && isAdded() )
+				{
+					if( IS_API_19_OR_LATER )
+					{
+						toggleImmersiveMode( activity );
+					}
+					else
+					{
+						toggleFullscreen( activity );
+					}
+				}
+				handled = true;
+			}
+			break;
 			case R.id.menu_item_download:
 			{
 				if( activity != null && isAdded() )
@@ -292,6 +318,66 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		}
 
 		return handled;
+	}
+
+
+	private void toggleImmersiveMode( final Activity activity )
+	{
+		Window window = activity.getWindow();
+
+		boolean visible = (window.getDecorView().getSystemUiVisibility() & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0;
+		if( visible )
+		{
+			enterImmersiveMode( window );
+		}
+		else
+		{
+			exitImmersiveMode( window );
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.KITKAT)
+	private void enterImmersiveMode( Window window )
+	{
+		View decorView = window.getDecorView();
+		decorView.setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+		                                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+		                                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+		                                 View.SYSTEM_UI_FLAG_FULLSCREEN |
+		                                 View.SYSTEM_UI_FLAG_IMMERSIVE );
+	}
+
+	private void exitImmersiveMode( Window window )
+	{
+		View decorView = window.getDecorView();
+		decorView.setSystemUiVisibility( 0 );
+	}
+
+	private void showSystemUI()
+	{
+		Activity activity = getActivity();
+		if( activity != null )
+		{
+			View decorView = activity.getWindow().getDecorView();
+			decorView.setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+			                                 View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+			                                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN );
+		}
+	}
+
+	private void toggleFullscreen( final Activity activity )
+	{
+		Window window = activity.getWindow();
+		WindowManager.LayoutParams attrs = window.getAttributes();
+		if( (attrs.flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) == 0 )
+		{
+			attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+		}
+		else
+		{
+			attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+		}
+		window.setAttributes( attrs );
 	}
 
 	public static String createRandditUrl( final Post post, final NavDrawerAdapter.NavItem category )
@@ -413,6 +499,21 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 				ObjectAnimator titleAnim = ObjectAnimator.ofFloat( m_titleView, "translationY", 0.0f );
 				titleAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
 				titleAnim.start();
+			}
+		}
+	}
+
+	@Override
+	public void onSystemUiVisibilityChange( final int flags )
+	{
+		Activity activity = getActivity();
+
+		if( activity != null && IS_API_19_OR_LATER )
+		{
+			boolean visible = (flags & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0;
+			if( visible )
+			{
+				exitImmersiveMode( activity.getWindow() );
 			}
 		}
 	}

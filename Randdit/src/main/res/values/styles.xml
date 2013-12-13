@@ -9,6 +9,9 @@
 
     <style name="RandditActionBar" parent="android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
         <item name="android:background">@color/primary</item>
+        <!--
+        <item name="android:windowActionBarOverlay">true</item>
+        -->
     </style>
 
     <style name="RandditButton" parent="android:style/Widget.Button">

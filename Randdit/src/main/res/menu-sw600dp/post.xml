@@ -7,6 +7,13 @@
         android:title="@string/menu_share"
         android:actionProviderClass=
             "android.widget.ShareActionProvider"/>
+
+    <item
+        android:id="@+id/menu_item_fullscreen"
+        android:icon="@drawable/ic_action_expand"
+        android:title="@string/menu_fullscreen"
+        android:showAsAction="ifRoom"/>
+
     <item
         android:id="@+id/menu_item_download"
         android:icon="@drawable/ic_action_download"

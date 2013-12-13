@@ -26,6 +26,7 @@
     <string name="menu_share">Share</string>
     <string name="menu_download">Download</string>
     <string name="menu_wallpaper">Set as wallpaper</string>
+    <string name="menu_fullscreen">Toggle Fullscreen</string>
 
     <string name="share_body">%1$s - %2$s - via Randdit Android</string>
     <string name="share_body_no_ad">%1$s - %2$s</string>
