@@ -11,4 +11,8 @@
 
     <color name="fading_edge_start">#EE666666</color>
     <color name="fading_edge_end">#00666666</color>
+
+    <color name="nav_drawer_background">#111</color>
+    <color name="nav_drawer_divider_start">#FF777777</color>
+    <color name="nav_drawer_divider_end">#00555555</color>
 </resources>

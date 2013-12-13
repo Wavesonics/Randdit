@@ -68,6 +68,7 @@ public class PostInfoFragment extends DialogFragment
 
 			TextView permalinkView = (TextView) view.findViewById( R.id.POSTINFO_permalink );
 			permalinkView.setText( REDDIT_BASE_URL + m_post.permalink );
+			permalinkView.setSelected( true );
 		}
 
 		Dialog dialog = getDialog();

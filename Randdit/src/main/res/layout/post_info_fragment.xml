@@ -25,38 +25,19 @@
             android:layout_marginTop="@dimen/postinfo_spacing">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/postinfo_user"/>
-
-            <TextView
                 android:id="@+id/POSTINFO_user"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/postinfo_spacing"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 tools:text="authorsUserName"/>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/postinfo_spacing">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/postinfo_created"/>
-
             <TextView
                 android:id="@+id/POSTINFO_created"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/postinfo_spacing"
+                android:layout_weight="1"
+                android:gravity="right"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 tools:text="10/24/2013"/>
 
@@ -64,11 +45,13 @@
 
         <TextView
             android:id="@+id/POSTINFO_permalink"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/postinfo_spacing"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:autoLink="web"
+            android:singleLine="true"
+            android:ellipsize="end"
             tools:text="randdit.com"/>
 
     </LinearLayout>

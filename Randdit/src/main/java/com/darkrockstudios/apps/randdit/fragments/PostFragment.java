@@ -33,9 +33,6 @@ import com.darkrockstudios.apps.randdit.misc.Post;
 import com.darkrockstudios.apps.randdit.misc.PurchaseScreenProvider;
 import com.darkrockstudios.views.uriimageview.UriImageHandler;
 import com.darkrockstudios.views.uriimageview.UriImageView;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.Fields;
-import com.google.analytics.tracking.android.MapBuilder;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
@@ -114,9 +111,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 
 		m_imageHandler = new UriImageHandler();
 
-		EasyTracker tracker = EasyTracker.getInstance( getActivity() );
-		tracker.set( Fields.SCREEN_NAME, PostFragment.class.getSimpleName() );
-		tracker.send( MapBuilder.createAppView().build() );
+		Analytics.trackScreen( getActivity(), PostFragment.class.getSimpleName(), m_isPro );
 	}
 
 	@Override
@@ -261,7 +256,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 					intent.setData( uri );
 					activity.startService( intent );
 
-					Analytics.trackDownload( activity, m_category );
+					Analytics.trackDownload( activity, m_category, m_isPro );
 				}
 				handled = true;
 			}
@@ -278,7 +273,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 						intent.putExtra( DownloadService.EXTRA_SET_WALLPAPER, true );
 						activity.startService( intent );
 
-						Analytics.trackWallpaper( activity, m_category );
+						Analytics.trackWallpaper( activity, m_category, m_isPro );
 					}
 					else if( m_purchaseScreenProvider != null )
 					{

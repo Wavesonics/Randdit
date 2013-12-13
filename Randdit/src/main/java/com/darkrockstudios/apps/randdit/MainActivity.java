@@ -110,7 +110,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		}
 		else if( postId == null )
 		{
-			IntroFragment fragment = IntroFragment.newInstance();
+			IntroFragment fragment = IntroFragment.newInstance( isPro() );
 
 			FragmentManager fragmentManager = getFragmentManager();
 			fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
@@ -194,22 +194,16 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 				Intent intent = new Intent( this, SettingsActivity.class );
 				startActivity( intent );
 
-				Analytics.trackSettings( this );
+				Analytics.trackSettings( this, isPro() );
 			}
 			else if( id == R.id.menu_item_share )
 			{
-				Analytics.trackShare( this, m_currentCategory );
+				Analytics.trackShare( this, m_currentCategory, isPro() );
 				handled = super.onOptionsItemSelected( item );
-			}
-			else if( id == R.id.action_purchase_pro )
-			{
-				showPurchaseScreen();
-
-				handled = true;
 			}
 			else
 			{
-				handled = super.onOptionsItemSelected( item );
+				handled = false;
 			}
 		}
 		return handled;
@@ -326,7 +320,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			updateCategory( NavDrawerAdapter.NavItem.all );
 		}
 
-		Analytics.trackNextImageClick( this, m_currentCategory );
+		Analytics.trackNextImageClick( this, m_currentCategory, isPro() );
 		showPost();
 	}
 
@@ -361,7 +355,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			m_posts.clear();
 			requestPosts();
 
-			Analytics.trackCategoryChange( this, m_currentCategory );
+			Analytics.trackCategoryChange( this, m_currentCategory, isPro() );
 		}
 		else
 		{

@@ -8,21 +8,28 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.darkrockstudios.apps.randdit.R;
+import com.darkrockstudios.apps.randdit.misc.Analytics;
 import com.darkrockstudios.apps.randdit.misc.NextButtonEnabler;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.Fields;
-import com.google.analytics.tracking.android.MapBuilder;
 
 /**
  * Created by Adam on 11/23/13.
  */
 public class IntroFragment extends Fragment implements NextButtonEnabler
 {
-	private Button m_getStartedButton;
+	private static final String ARG_PRO = PostFragment.class.getName() + ".PRO";
 
-	public static IntroFragment newInstance()
+	private boolean m_isPro;
+	private Button  m_getStartedButton;
+
+	public static IntroFragment newInstance( final boolean isPro )
 	{
-		return new IntroFragment();
+		IntroFragment fragment = new IntroFragment();
+
+		Bundle args = new Bundle();
+		args.putBoolean( ARG_PRO, isPro );
+		fragment.setArguments( args );
+
+		return fragment;
 	}
 
 	@Override
@@ -30,9 +37,13 @@ public class IntroFragment extends Fragment implements NextButtonEnabler
 	{
 		super.onCreate( savedInstanceState );
 
-		EasyTracker tracker = EasyTracker.getInstance( getActivity() );
-		tracker.set( Fields.SCREEN_NAME, IntroFragment.class.getSimpleName() );
-		tracker.send( MapBuilder.createAppView().build() );
+		Bundle args = getArguments();
+		if( args != null )
+		{
+			m_isPro = args.getBoolean( ARG_PRO );
+		}
+
+		Analytics.trackScreen( getActivity(), IntroFragment.class.getSimpleName(), m_isPro );
 	}
 
 	@Override

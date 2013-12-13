@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.darkrockstudios.apps.randdit.R;
+import com.darkrockstudios.apps.randdit.misc.Analytics;
 import com.darkrockstudios.apps.randdit.misc.PurchaseProvider;
 
 /**
@@ -25,7 +26,7 @@ public class PurchaseProFragment extends DialogFragment implements View.OnClickL
 	}
 
 	@Override
-	public void onAttach( Activity activity )
+	public void onAttach( final Activity activity )
 	{
 		super.onAttach( activity );
 
@@ -44,7 +45,15 @@ public class PurchaseProFragment extends DialogFragment implements View.OnClickL
 	}
 
 	@Override
-	public View onCreateView( final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState )
+	public void onCreate( final Bundle savedInstanceState )
+	{
+		super.onCreate( savedInstanceState );
+
+		Analytics.trackScreen( getActivity(), PurchaseProFragment.class.getSimpleName(), false );
+	}
+
+	@Override
+	public View onCreateView( final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState )
 	{
 		View view = inflater.inflate( R.layout.purchase_pro, container, false );
 
@@ -61,7 +70,7 @@ public class PurchaseProFragment extends DialogFragment implements View.OnClickL
 	}
 
 	@Override
-	public void onClick( View v )
+	public void onClick( final View v )
 	{
 		if( v.getId() == R.id.PRO_purchase_button && m_purchaseProvider != null )
 		{

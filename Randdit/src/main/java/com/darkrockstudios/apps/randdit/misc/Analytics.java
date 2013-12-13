@@ -11,11 +11,20 @@ import com.google.analytics.tracking.android.MapBuilder;
  */
 public final class Analytics
 {
-	public static void trackNextImageClick( final Context context, final NavDrawerAdapter.NavItem category )
+	public static void trackScreen( final Context context, final String screenName, final boolean pro )
+	{
+		EasyTracker easyTracker = EasyTracker.getInstance( context );
+		easyTracker.set( Fields.SCREEN_NAME, screenName );
+		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
+		easyTracker.send( MapBuilder.createAppView().build() );
+	}
+
+	public static void trackNextImageClick( final Context context, final NavDrawerAdapter.NavItem category, final boolean pro )
 	{
 		EasyTracker easyTracker = EasyTracker.getInstance( context );
 
 		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
+		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
 		easyTracker.send( MapBuilder
 				                  .createEvent( "ui_action",     // Event category (required)
 				                                "button_press",  // Event action (required)
@@ -25,11 +34,12 @@ public final class Analytics
 		);
 	}
 
-	public static void trackCategoryChange( final Context context, final NavDrawerAdapter.NavItem category )
+	public static void trackCategoryChange( final Context context, final NavDrawerAdapter.NavItem category, final boolean pro )
 	{
 		EasyTracker easyTracker = EasyTracker.getInstance( context );
 
 		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
+		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
 		easyTracker.send( MapBuilder
 				                  .createEvent( "ui_action",     // Event category (required)
 				                                "button_press",  // Event action (required)
@@ -39,11 +49,12 @@ public final class Analytics
 		);
 	}
 
-	public static void trackDownload( final Context context, final NavDrawerAdapter.NavItem category )
+	public static void trackDownload( final Context context, final NavDrawerAdapter.NavItem category, final boolean pro )
 	{
 		EasyTracker easyTracker = EasyTracker.getInstance( context );
 
 		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
+		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
 		easyTracker.send( MapBuilder
 				                  .createEvent( "ui_action",     // Event category (required)
 				                                "button_press",  // Event action (required)
@@ -53,11 +64,12 @@ public final class Analytics
 		);
 	}
 
-	public static void trackWallpaper( final Context context, final NavDrawerAdapter.NavItem category )
+	public static void trackWallpaper( final Context context, final NavDrawerAdapter.NavItem category, final boolean pro )
 	{
 		EasyTracker easyTracker = EasyTracker.getInstance( context );
 
 		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
+		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
 		easyTracker.send( MapBuilder
 				                  .createEvent( "ui_action",     // Event category (required)
 				                                "button_press",  // Event action (required)
@@ -67,10 +79,11 @@ public final class Analytics
 		);
 	}
 
-	public static void trackSettings( final Context context )
+	public static void trackSettings( final Context context, final boolean pro )
 	{
 		EasyTracker easyTracker = EasyTracker.getInstance( context );
 
+		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
 		easyTracker.send( MapBuilder
 				                  .createEvent( "ui_action",     // Event category (required)
 				                                "button_press",  // Event action (required)
@@ -80,7 +93,22 @@ public final class Analytics
 		);
 	}
 
-	public static void trackShare( final Context context, final NavDrawerAdapter.NavItem category )
+	public static void trackShare( final Context context, final NavDrawerAdapter.NavItem category, final boolean pro )
+	{
+		EasyTracker easyTracker = EasyTracker.getInstance( context );
+
+		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
+		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
+		easyTracker.send( MapBuilder
+				                  .createEvent( "ui_action",     // Event category (required)
+				                                "button_press",  // Event action (required)
+				                                "settings_button",   // Event label
+				                                null )            // Event value
+				                  .build()
+		);
+	}
+
+	public static void trackProClick( final Context context, final NavDrawerAdapter.NavItem category )
 	{
 		EasyTracker easyTracker = EasyTracker.getInstance( context );
 
@@ -88,7 +116,7 @@ public final class Analytics
 		easyTracker.send( MapBuilder
 				                  .createEvent( "ui_action",     // Event category (required)
 				                                "button_press",  // Event action (required)
-				                                "settings_button",   // Event label
+				                                "purchase_pro",   // Event label
 				                                null )            // Event value
 				                  .build()
 		);
