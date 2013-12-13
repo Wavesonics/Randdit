@@ -13,7 +13,7 @@
     <string name="pref_title_show_wtf">Show the WTF category</string>
     <string name="pref_summary_show_wtf">The WTF category contains NSFW and adult material, by showing it you agree to see some weird shit</string>
     <string name="pref_title_append_ad">Append Randdit to shares</string>
-    <string name="pref_summary_append_ad">Append the Randdit to share text</string>
+    <string name="pref_summary_append_ad">Disabling this give you shorter share text [Pro Feature]</string>
     <string name="pref_stats_title">Stats</string>
     <string name="pref_image_views_title">Images Viewed</string>
 
