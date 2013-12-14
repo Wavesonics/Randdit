@@ -15,7 +15,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.android.vending.billing.IInAppBillingService;
-import com.darkrockstudios.apps.randdit.billing.Security;
+import com.darkrockstudios.apps.randdit.billing.BillingSecurity;
 import com.darkrockstudios.apps.randdit.misc.Preferences;
 import com.darkrockstudios.apps.randdit.misc.PurchaseProvider;
 
@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Adam on 12/10/13.
@@ -33,12 +34,19 @@ public class BillingActivity extends Activity implements PurchaseProvider
 	private static final String PRODUCT_SKU_PRO = "randdit_pro";
 	//private static final String PRODUCT_SKU_PRO = "android.test.purchased";
 
+	private static final String EENY  =
+			"ZVVOVwNAOtxduxvT9j0ONDRSNNBPND8NZVVOPtXPNDRNz81E0pv/HQwMsW+2lFmja7zoOusao0U5nDuptBr90SXcAAAl7/SOze";
+	private static final String MEENY =
+			"xu1i3A7Vun/fvV77glWfrimcffdiHUxN24qWM6gRr+yTp2o6nTEcxQAwDrYMfo93525YOQU7eSuubV+gpdwsM2Q8qViF273jsJ";
+
 	private boolean m_isPro;
 
 	private IInAppBillingService     m_service;
 	private BillingServiceConnection m_serviceConn;
 
 	private ProStatusListener m_statusListener;
+
+	private String m_devPayload;
 
 	public static interface ProStatusListener
 	{
@@ -142,20 +150,28 @@ public class BillingActivity extends Activity implements PurchaseProvider
 				{
 					ArrayList<String> ownedSkus = ownedItems.getStringArrayList( "INAPP_PURCHASE_ITEM_LIST" );
 					ArrayList<String> purchaseDataList = ownedItems.getStringArrayList( "INAPP_PURCHASE_DATA_LIST" );
-					//ArrayList<String> signatureList = ownedItems.getStringArrayList( "INAPP_DATA_SIGNATURE" );
+					ArrayList<String> signatureList = ownedItems.getStringArrayList( "INAPP_DATA_SIGNATURE_LIST" );
 					//String continuationToken = ownedItems.getString( "INAPP_CONTINUATION_TOKEN" );
 
-					for( int i = 0; i < purchaseDataList.size(); ++i )
+					for( int ii = 0; ii < purchaseDataList.size(); ++ii )
 					{
-						String purchaseData = purchaseDataList.get( i );
-						//String signature = signatureList.get( i );
-						String sku = ownedSkus.get( i );
+						String purchaseData = purchaseDataList.get( ii );
+						String dataSignature = signatureList.get( ii );
+						String sku = ownedSkus.get( ii );
 
-						if( sku.equals( PRODUCT_SKU_PRO ) )
+						if( sku.equals( PRODUCT_SKU_PRO ) && verifyPurchase( purchaseData, dataSignature ) )
 						{
 							Log.d( TAG, "Holy crap we're pro!" );
 							cacheProLocally();
 							m_isPro = true;
+
+							/*
+							// Consume the purchase for dev reset purposes
+							JSONObject jo = new JSONObject( purchaseData );
+							String token = jo.getString( "purchaseToken" );
+							int consumeResponse = m_service.consumePurchase( 3, getPackageName(), token );
+							Log.d( TAG, "Purchase consumed!");
+							*/
 						}
 					}
 				}
@@ -179,8 +195,9 @@ public class BillingActivity extends Activity implements PurchaseProvider
 		{
 			try
 			{
+				m_devPayload = generateNewDevPayload();
 				Bundle buyIntentBundle =
-						m_service.getBuyIntent( 3, getPackageName(), PRODUCT_SKU_PRO, "inapp", "empty_payload" );
+						m_service.getBuyIntent( 3, getPackageName(), PRODUCT_SKU_PRO, "inapp", m_devPayload );
 
 				int responseCode = buyIntentBundle.getInt( "RESPONSE_CODE", 0 );
 				if( responseCode == 0 )
@@ -210,14 +227,17 @@ public class BillingActivity extends Activity implements PurchaseProvider
 			String purchaseData = data.getStringExtra( "INAPP_PURCHASE_DATA" );
 			String dataSignature = data.getStringExtra( "INAPP_DATA_SIGNATURE" );
 
-			if( resultCode == RESULT_OK )
+			if( resultCode == RESULT_OK && responseCode == 0 )
 			{
 				try
 				{
 					JSONObject jo = new JSONObject( purchaseData );
 					String sku = jo.getString( "productId" );
-					// verifyPurchase( purchaseData, dataSignature )
-					if( PRODUCT_SKU_PRO.equals( sku ) )
+					String devPayload = jo.getString( "developerPayload" );
+
+					if( PRODUCT_SKU_PRO.equals( sku ) &&
+					    verifyPurchase( purchaseData, dataSignature ) &&
+					    m_devPayload.equals( devPayload ) )
 					{
 						Log.d( TAG, "You have bought " + sku );
 
@@ -238,6 +258,13 @@ public class BillingActivity extends Activity implements PurchaseProvider
 		}
 	}
 
+	private String generateNewDevPayload()
+	{
+		final Date now = new Date();
+		final long fudge = now.getTime() / 7l;
+		return BillingSecurity.sha1Hash( fudge + "noh4xplz" );
+	}
+
 	private void cacheProLocally()
 	{
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( this );
@@ -246,11 +273,14 @@ public class BillingActivity extends Activity implements PurchaseProvider
 
 	private String assemblePublicKey()
 	{
-		return "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm81R0ci/UDjZfJ+2ySzwn7mbBhfnb0H5aQhcgOe90FKpNNNy7/FBmrkh1v3N7Iha/siI77tyJsevzpssqvUHkA24dJZ6tEe+lGc2b6aGRpkDNjQeLZsb93525LBDH7rFhhoI+tcqjfZ2D8dIvS273wfWA2I4YiEvfwwrrsZvb4AKHHmavW+zqZRSs7pD+Mm1X1VvSMmFyX+6e/O974ptkKzd111VeozV3pbIJZ3Rl6YeEHHS32YVlc4Ae9vP1W1P96ICpfOufyBO5e77O6sf7drTFHp45I9E0QGhEIwIT3VqeMiCmQU3iYSOMp3bgCLTOsDVeVuy7WHac46XzCFkPwIDAQAB";
+		return BillingSecurity.superSecureCrypto( EENY ) +
+		       BillingSecurity.superSecureCrypto( MEENY ) +
+		       BillingSecurity.superSecureCrypto( getString( R.string.miny ) ) +
+		       BillingSecurity.superSecureCrypto( getString( R.string.moe ) );
 	}
 
 	private boolean verifyPurchase( final String data, final String signature )
 	{
-		return Security.verifyPurchase( assemblePublicKey(), data, signature );
+		return BillingSecurity.verifySignature( assemblePublicKey(), data, signature );
 	}
 }

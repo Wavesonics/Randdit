@@ -2,4 +2,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="admob_post_banner_unit_id">ca-app-pub-2108510815386208/5833300378</string>
     <string name="android_backup_api_key" tools:ignore="TypographyDashes">AEdPqrEAAAAI6DKu--811C4_BhM4qame1c55imFsdEMyIiBUAw</string>
+    <string name="miny">N2V4LvRisjjeefMio4NXUUzniJ+mdMEFf7cQ+Zz1K1IiFZzSlK+6r/B974cgxXmq111IrbmI3coVWM3Ey6LrRUUF32LIyp4Nr9</string>
+    <string name="moe">iC1J1C96VPcsBhslOB5r77B6fs7qeGSUc45V9R0DTuRVjVG3IdrZvPzDH3vLFBZc3otPYGBfQIrIhl7JUnp46KmPSxCjVQNDNO</string>
 </resources>

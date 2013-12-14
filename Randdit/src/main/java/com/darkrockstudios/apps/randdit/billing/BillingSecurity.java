@@ -8,8 +8,10 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -18,17 +20,17 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
 /**
- * Security-related methods. For a secure implementation, all of this code
+ * BillingSecurity-related methods. For a secure implementation, all of this code
  * should be implemented on a server that communicates with the
  * application on the device. For the sake of simplicity and clarity of this
  * example, this code is included here and is executed on the device. If you
- * must verify the purchases on the phone, you should obfuscate this code to
+ * must performVerify the purchases on the phone, you should obfuscate this code to
  * make it harder for an attacker to replace the code with stubs that treat all
  * purchases as verified.
  */
-public class Security
+public class BillingSecurity
 {
-	private static final String TAG = "IABUtil/Security";
+	private static final String TAG = BillingSecurity.class.getSimpleName();
 
 	private static final String KEY_FACTORY_ALGORITHM = "RSA";
 	private static final String SIGNATURE_ALGORITHM   = "SHA1withRSA";
@@ -43,17 +45,22 @@ public class Security
 	 * @param signedData      the signed JSON string (signed, not encrypted)
 	 * @param signature       the signature for the data, signed with the private key
 	 */
-	public static boolean verifyPurchase( String base64PublicKey, String signedData, String signature )
+	public static boolean verifySignature( final String base64PublicKey, final String signedData, final String signature )
 	{
+		final boolean verified;
+
 		if( TextUtils.isEmpty( signedData ) || TextUtils.isEmpty( base64PublicKey ) ||
 		    TextUtils.isEmpty( signature ) )
 		{
 			Log.e( TAG, "Purchase verification failed: missing data." );
-			return false;
+			verified = false;
 		}
-
-		PublicKey key = Security.generatePublicKey( base64PublicKey );
-		return Security.verify( key, signedData, signature );
+		else
+		{
+			PublicKey key = BillingSecurity.unpackPublicKey( base64PublicKey );
+			verified = BillingSecurity.performVerify( key, signedData, signature );
+		}
+		return verified;
 	}
 
 	/**
@@ -63,7 +70,7 @@ public class Security
 	 * @param encodedPublicKey Base64-encoded public key
 	 * @throws IllegalArgumentException if encodedPublicKey is invalid
 	 */
-	public static PublicKey generatePublicKey( String encodedPublicKey )
+	public static PublicKey unpackPublicKey( final String encodedPublicKey )
 	{
 		try
 		{
@@ -91,34 +98,95 @@ public class Security
 	 * @param signature  server signature
 	 * @return true if the data and signature match
 	 */
-	public static boolean verify( PublicKey publicKey, String signedData, String signature )
+	public static boolean performVerify( final PublicKey publicKey, final String signedData, final String signature )
 	{
+		boolean verified = false;
+
 		Signature sig;
 		try
 		{
 			sig = Signature.getInstance( SIGNATURE_ALGORITHM );
 			sig.initVerify( publicKey );
 			sig.update( signedData.getBytes() );
-			if( !sig.verify( Base64.decode( signature, 0 ) ) )
+			if( sig.verify( Base64.decode( signature, 0 ) ) )
+			{
+				verified = true;
+			}
+			else
 			{
 				Log.e( TAG, "Signature verification failed." );
-				return false;
 			}
-			return true;
 		}
-		catch( NoSuchAlgorithmException e )
+		catch( NoSuchAlgorithmException | InvalidKeyException | SignatureException e )
 		{
-			Log.e( TAG, "NoSuchAlgorithmException." );
-		}
-		catch( InvalidKeyException e )
-		{
-			Log.e( TAG, "Invalid key specification." );
-		}
-		catch( SignatureException e )
-		{
-			Log.e( TAG, "Signature exception." );
+			Log.e( TAG, e.getMessage() );
 		}
 
-		return false;
+		return verified;
+	}
+
+	public static String sha1Hash( final String toHash )
+	{
+		String hash = null;
+		try
+		{
+			MessageDigest digest = MessageDigest.getInstance( "SHA-1" );
+			byte[] bytes = toHash.getBytes( "UTF-8" );
+			digest.update( bytes, 0, bytes.length );
+			bytes = digest.digest();
+			StringBuilder sb = new StringBuilder();
+			for( byte b : bytes )
+			{
+				sb.append( String.format( "%02X", b ) );
+			}
+			hash = sb.toString();
+		}
+		catch( NoSuchAlgorithmException | UnsupportedEncodingException e )
+		{
+			e.printStackTrace();
+		}
+
+		return hash;
+	}
+
+	public static String xorString( final String input, final char[] key )
+	{
+		final StringBuilder builder = new StringBuilder();
+		for( int ii = 0; ii < input.length(); ++ii )
+		{
+			final int keySegment = key[ ii % key.length ];
+			final char c = input.charAt( ii );
+
+			builder.append( c ^ keySegment );
+		}
+
+		return builder.toString();
+	}
+
+	public static String superSecureCrypto( final String input )
+	{
+		StringBuilder sb = new StringBuilder();
+		for( int i = 0; i < input.length(); i++ )
+		{
+			char c = input.charAt( i );
+			if( c >= 'a' && c <= 'm' )
+			{
+				c += 13;
+			}
+			else if( c >= 'A' && c <= 'M' )
+			{
+				c += 13;
+			}
+			else if( c >= 'n' && c <= 'z' )
+			{
+				c -= 13;
+			}
+			else if( c >= 'N' && c <= 'Z' )
+			{
+				c -= 13;
+			}
+			sb.append( c );
+		}
+		return sb.toString();
 	}
 }
