@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 
@@ -80,6 +81,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	@Override
 	protected void onCreate( final Bundle savedInstanceState )
 	{
+		requestWindowFeature( Window.FEATURE_INDETERMINATE_PROGRESS );
 		setProStatusListener( this );
 
 		super.onCreate( savedInstanceState );
