@@ -11,13 +11,14 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
+import pl.droidsonroids.gif.GifDrawable;
 import uk.co.senab.photoview.PhotoView;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
  * Created by Adam on 11/22/13.
  */
-public class UriImageView extends FrameLayout implements PhotoViewAttacher.OnMatrixChangedListener
+public class UriImageView extends FrameLayout implements PhotoViewAttacher.OnMatrixChangedListener, PhotoViewAttacher.OnPhotoTapListener
 {
 	private static final String TAG = UriImageView.class.getSimpleName();
 
@@ -38,6 +39,18 @@ public class UriImageView extends FrameLayout implements PhotoViewAttacher.OnMat
 	private ImageZoomListener m_zoomListener;
 	private boolean           m_zooming;
 
+	@Override
+	public void onPhotoTap( final View view, final float v, final float v2 )
+	{
+		// Restart animated GIFs
+		Drawable drawable = m_imageView.getDrawable();
+		if( drawable != null && drawable instanceof GifDrawable )
+		{
+			GifDrawable gifDrawable = (GifDrawable) drawable;
+			gifDrawable.reset();
+		}
+	}
+
 	public static interface ImageZoomListener
 	{
 		public void beganZooming( UriImageView uriImageView );
@@ -57,6 +70,7 @@ public class UriImageView extends FrameLayout implements PhotoViewAttacher.OnMat
 		addView( m_imageView );
 
 		m_imageView.setOnMatrixChangeListener( this );
+		m_imageView.setOnPhotoTapListener( this );
 
 		m_progressBar = new ProgressBar( context, null, android.R.attr.progressBarStyleHorizontal );
 		m_progressBar.setIndeterminate( false );
@@ -82,7 +96,7 @@ public class UriImageView extends FrameLayout implements PhotoViewAttacher.OnMat
 		setupViews( context, null, 0 );
 	}
 
-	public void setZoomListener( ImageZoomListener zoomListener )
+	public void setZoomListener( final ImageZoomListener zoomListener )
 	{
 		m_zoomListener = zoomListener;
 	}
@@ -192,7 +206,7 @@ public class UriImageView extends FrameLayout implements PhotoViewAttacher.OnMat
 	}
 
 	@Override
-	public void onMatrixChanged( RectF rectF )
+	public void onMatrixChanged( final RectF rectF )
 	{
 		if( m_zoomListener != null )
 		{
