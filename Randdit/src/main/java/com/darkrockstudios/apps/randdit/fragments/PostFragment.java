@@ -219,6 +219,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		super.onViewCreated( view, savedInstanceState );
 
 		ViewGroup postInfoContainer = (ViewGroup) view.findViewById( R.id.POST_post_info_container );
+
 		if( postInfoContainer != null )
 		{
 			PostInfoFragment postInfoFragment = PostInfoFragment.newInstance( m_post );
@@ -264,6 +265,8 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 			{
 				if( activity != null && isAdded() )
 				{
+					Analytics.trackFullscreen( activity, m_category, m_isPro );
+
 					if( IS_API_19_OR_LATER )
 					{
 						toggleImmersiveMode( activity );
@@ -395,8 +398,14 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		Intent intent = new Intent( Intent.ACTION_SEND );
 		intent.setData( Uri.parse( post.url ) );
 
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( getActivity() );
-		boolean appendAd = settings.getBoolean( Preferences.KEY_APPEND_AD, true );
+		Activity activity = getActivity();
+		boolean appendAd = false;
+		if( activity != null )
+		{
+			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( activity );
+			appendAd = settings.getBoolean( Preferences.KEY_APPEND_AD, true );
+		}
+
 		final int shareBodyResource;
 		if( appendAd )
 		{
@@ -450,8 +459,8 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		FragmentManager fragmentManager = getFragmentManager();
 		if( fragmentManager != null )
 		{
-			PostInfoFragment editNameDiapostInfoFragmentog = PostInfoFragment.newInstance( m_post );
-			editNameDiapostInfoFragmentog.show( fragmentManager, FRAGMENT_TAG_POST_INFO );
+			PostInfoFragment postInfoFragment = PostInfoFragment.newInstance( m_post );
+			postInfoFragment.show( fragmentManager, FRAGMENT_TAG_POST_INFO );
 		}
 	}
 
@@ -460,7 +469,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		return m_post;
 	}
 
-	private boolean shouldDissmissUi()
+	private boolean shouldDismissUi()
 	{
 		return !m_isTabletLayout && IS_API_18_OR_LATER;
 	}
@@ -468,18 +477,20 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	@Override
 	public void beganZooming( final UriImageView uriImageView )
 	{
-		if( shouldDissmissUi() )
+		final long DURATION = 400;
+
+		if( shouldDismissUi() )
 		{
 			ObjectAnimator toolbarAnim = ObjectAnimator.ofFloat( m_toolBarView, "translationY", m_toolBarView.getHeight() );
 			toolbarAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
-			toolbarAnim.setDuration( 400 );
+			toolbarAnim.setDuration( DURATION );
 			toolbarAnim.start();
 
 			if( m_titleView != null )
 			{
 				ObjectAnimator titleAnim = ObjectAnimator.ofFloat( m_titleView, "translationY", -m_toolBarView.getHeight() );
 				titleAnim.setInterpolator( new AccelerateDecelerateInterpolator() );
-				titleAnim.setDuration( 400 );
+				titleAnim.setDuration( DURATION );
 				titleAnim.start();
 			}
 		}
@@ -488,7 +499,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	@Override
 	public void endedZooming( final UriImageView uriImageView )
 	{
-		if( shouldDissmissUi() )
+		if( shouldDismissUi() )
 		{
 			ObjectAnimator toolbarAnim = ObjectAnimator.ofFloat( m_toolBarView, "translationY", 0.0f );
 			toolbarAnim.setInterpolator( new AccelerateDecelerateInterpolator() );

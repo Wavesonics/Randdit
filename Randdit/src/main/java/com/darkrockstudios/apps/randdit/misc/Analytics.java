@@ -27,8 +27,8 @@ public final class Analytics
 		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
 		easyTracker.send( MapBuilder
 				                  .createEvent( "ui_action",     // Event category (required)
-				                                "button_press",  // Event action (required)
-				                                "get_next_image",   // Event label
+				                                "get_next_image",  // Event action (required)
+				                                "Get next image",   // Event label
 				                                null )            // Event value
 				                  .build()
 		);
@@ -42,8 +42,8 @@ public final class Analytics
 		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
 		easyTracker.send( MapBuilder
 				                  .createEvent( "ui_action",     // Event category (required)
-				                                "button_press",  // Event action (required)
-				                                "nav_item_button",   // Event label
+				                                "category_selected",  // Event action (required)
+				                                "Category changed",   // Event label
 				                                null )            // Event value
 				                  .build()
 		);
@@ -57,8 +57,8 @@ public final class Analytics
 		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
 		easyTracker.send( MapBuilder
 				                  .createEvent( "ui_action",     // Event category (required)
-				                                "button_press",  // Event action (required)
-				                                "download_button",   // Event label
+				                                "download_button",  // Event action (required)
+				                                "Image downloaded",   // Event label
 				                                null )            // Event value
 				                  .build()
 		);
@@ -72,8 +72,8 @@ public final class Analytics
 		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
 		easyTracker.send( MapBuilder
 				                  .createEvent( "ui_action",     // Event category (required)
-				                                "button_press",  // Event action (required)
-				                                "wallpaper_button",   // Event label
+				                                "wallpaper_button",  // Event action (required)
+				                                "Wallpaper set",   // Event label
 				                                null )            // Event value
 				                  .build()
 		);
@@ -86,8 +86,8 @@ public final class Analytics
 		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
 		easyTracker.send( MapBuilder
 				                  .createEvent( "ui_action",     // Event category (required)
-				                                "button_press",  // Event action (required)
-				                                "settings_button",   // Event label
+				                                "settings_button",  // Event action (required)
+				                                "Settings",   // Event label
 				                                null )            // Event value
 				                  .build()
 		);
@@ -101,12 +101,28 @@ public final class Analytics
 		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
 		easyTracker.send( MapBuilder
 				                  .createEvent( "ui_action",     // Event category (required)
-				                                "button_press",  // Event action (required)
-				                                "settings_button",   // Event label
+				                                "share_button",  // Event action (required)
+				                                "Post shared",   // Event label
 				                                null )            // Event value
 				                  .build()
 		);
 	}
+
+	public static void trackFullscreen( final Context context, final NavDrawerAdapter.NavItem category, final boolean pro )
+	{
+		EasyTracker easyTracker = EasyTracker.getInstance( context );
+
+		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
+		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
+		easyTracker.send( MapBuilder
+				                  .createEvent( "ui_action",     // Event category (required)
+				                                "toggle_fullscreen",  // Event action (required)
+				                                "Toggle Fullscreen",   // Event label
+				                                null )            // Event value
+				                  .build()
+		);
+	}
+
 
 	public static void trackProClick( final Context context, final NavDrawerAdapter.NavItem category )
 	{
@@ -115,8 +131,8 @@ public final class Analytics
 		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
 		easyTracker.send( MapBuilder
 				                  .createEvent( "ui_action",     // Event category (required)
-				                                "button_press",  // Event action (required)
-				                                "purchase_pro",   // Event label
+				                                "purchase_pro",  // Event action (required)
+				                                "Pro dialog presented",   // Event label
 				                                null )            // Event value
 				                  .build()
 		);
