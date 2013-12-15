@@ -235,7 +235,7 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 		return drawable;
 	}
 
-	private Drawable createDrawable( ByteArrayOutputStream imageStream, List<String> mimeTypes )
+	private Drawable createDrawable( final ByteArrayOutputStream imageStream, final List<String> mimeTypes )
 	{
 		Drawable drawable = null;
 
@@ -243,9 +243,10 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 		{
 			if( imageStream != null && imageStream.size() > 0 && !m_canceled )
 			{
-				if( findMimeType( GIF_MIME_TYPE, mimeTypes ) )
+				byte[] bits = imageStream.toByteArray();
+
+				if( checkForGif( bits ) || findMimeType( GIF_MIME_TYPE, mimeTypes ) )
 				{
-					byte[] bits = imageStream.toByteArray();
 					try
 					{
 						GifDrawable gifDrawable = new GifDrawable( bits );
@@ -262,8 +263,6 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 				}
 				else if( isSupportedFormat( mimeTypes ) )
 				{
-					byte[] bits = imageStream.toByteArray();
-
 					Bitmap bitmap = BitmapFactory.decodeByteArray( bits, 0, bits.length );
 					if( bitmap != null )
 					{
@@ -319,6 +318,42 @@ public class UriImageDownloadTask extends AsyncTask<Uri, Integer, Drawable>
 		}
 
 		return drawable;
+	}
+
+	private boolean checkForGif( final byte[] bytes )
+	{
+		boolean isGif;
+
+		final byte[] GIF87a = { 0x47, 0x49, 0x46, 0x38, 0x37, 0x61 };
+		final byte[] GIF89a = { 0x47, 0x49, 0x46, 0x38, 0x39, 0x61 };
+
+		isGif = checkMagicWord( bytes, GIF87a );
+		if( !isGif )
+		{
+			isGif = checkMagicWord( bytes, GIF89a );
+		}
+
+		return isGif;
+	}
+
+	private boolean checkMagicWord( final byte[] bytes, final byte[] magicWord )
+	{
+		boolean magicWordFound = false;
+
+		if( bytes != null && magicWord != null && bytes.length > magicWord.length )
+		{
+			magicWordFound = true;
+			for( int ii = 0; ii < magicWord.length; ++ii )
+			{
+				if( bytes[ ii ] != magicWord[ ii ] )
+				{
+					magicWordFound = false;
+					break;
+				}
+			}
+		}
+
+		return magicWordFound;
 	}
 
 	@Override
