@@ -169,14 +169,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	@Override
 	public boolean onCreateOptionsMenu( final Menu menu )
 	{
-		if( isPro() )
-		{
-			getMenuInflater().inflate( R.menu.main_pro, menu );
-		}
-		else
-		{
-			getMenuInflater().inflate( R.menu.main, menu );
-		}
+		getMenuInflater().inflate( R.menu.main, menu );
 
 		return true;
 	}
