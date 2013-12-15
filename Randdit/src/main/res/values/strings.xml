@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">Randdit</string>
     <string name="drawer_open">open drawer</string>
     <string name="drawer_close">close drawer</string>
     <string name="load_first_image_button">Lets get started!</string>
     <string name="load_image_button">Show me another image!</string>
-    <string name="action_settings">Settings</string>
     <string name="title_settings">Settings</string>
     <string name="pref_general_title">General</string>
     <string name="pref_title_keep_screen_on">Keep screen on</string>
@@ -16,31 +16,27 @@
     <string name="pref_summary_append_ad">Disabling this give you shorter share text [Pro Feature]</string>
     <string name="pref_stats_title">Stats</string>
     <string name="pref_image_views_title">Images Viewed</string>
-
     <string name="toast_post_request_error">Failed to retrieve posts</string>
-
     <string name="intro_1">1. See those categories over in the Nav Drawer? Click on those to get interesting images in the category you want to see</string>
     <string name="intro_2">2. Click "Show me another image!" at the bottom to see more!</string>
     <string name="intro_3">3. Become the person who always shows their friends the funniest stuff!</string>
-
     <string name="menu_share">Share</string>
     <string name="menu_download">Download</string>
     <string name="menu_wallpaper">Set as wallpaper</string>
     <string name="menu_fullscreen">Toggle Fullscreen</string>
-
+    <string name="menu_settings">Settings</string>
+    <string name="menu_about">About</string>
     <string name="share_body">%1$s - %2$s - via Randdit Android</string>
     <string name="share_body_no_ad">%1$s - %2$s</string>
     <string name="toast_download_finished">Download finished</string>
     <string name="toast_download_started">Download started</string>
     <string name="toast_wallpaper_failed">Failed to set wallpaper</string>
     <string name="toast_wallpaper_success">Wallpaper set!</string>
-
     <string name="postinfo_title">Post Info</string>
     <string name="postinfo_user">User: </string>
     <string name="postinfo_created">Created: </string>
     <string name="postinfo_no_creation_date">unknown</string>
     <string name="MENU_purchase_pro">Go Pro!</string>
-
     <string name="PRO_title">Purchase Pro</string>
     <string name="PRO_header">Why go Pro?</string>
     <string name="PRO_point_1">No Ads! That means more screen space for Doge!</string>
@@ -48,5 +44,16 @@
     <string name="PRO_point_3">Option to disable the Randdit text when sharing links</string>
     <string name="PRO_point_4">More to come!</string>
     <string name="PRO_purchase_button">Purchase Pro Now!</string>
+    <string name="about_title">About</string>
+    <string name="about_body_header">Dark Rock Studios</string>
+    <string name="about_body_bio">Adam Brown (Wavesonics)</string>
+    <string name="about_body_email">darkrockstudios@gmail.com</string>
+    <string name="about_body_website">darkrockstudios.com</string>
+    <string name="about_body_market">Check out more of our apps:</string>
+    <string name="about_body_market_button">Google Play</string>
+    <string name="about_body_open_source">Randdit uses these awesome Open Source libs:</string>
+    <string name="about_body_github_giflib"><a href="https://github.com/koral--/android-gif-drawable">android-gif-drawable</a></string>
+    <string name="about_body_github_photoview"><a href="https://github.com/chrisbanes/PhotoView">PhotoView</a></string>
+    <string name="about_body_feedback"><i>Found a bug? Feature request?</i>\n<a href="https://github.com/Wavesonics/RandditTracker/issues/new">Log it here!</a></string>
 
 </resources>

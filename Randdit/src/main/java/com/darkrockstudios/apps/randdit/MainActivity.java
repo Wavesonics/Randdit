@@ -28,6 +28,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.darkrockstudios.apps.randdit.fragments.AboutFragment;
 import com.darkrockstudios.apps.randdit.fragments.IntroFragment;
 import com.darkrockstudios.apps.randdit.fragments.PostFragment;
 import com.darkrockstudios.apps.randdit.fragments.PurchaseProFragment;
@@ -57,6 +58,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 
 	private static final String CONTENT_FRAGMENT_TAG  = "ContentFragment";
 	private static final String PURCHASE_FRAGMENT_TAG = "PurchaseFragment";
+	private static final String ABOUT_FRAGMENT_TAG = "AboutFragment";
 
 	private static final String SAVE_POSTS    = MainActivity.class.getName() + ".POSTS";
 	private static final String SAVE_NAV_ITEM = MainActivity.class.getName() + ".NAV_ITEM";
@@ -185,19 +187,26 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		else
 		{
 			int id = item.getItemId();
-			if( id == R.id.action_settings )
+			if( id == R.id.menu_item_settings )
 			{
-				handled = true;
-
 				Intent intent = new Intent( this, SettingsActivity.class );
 				startActivity( intent );
 
 				Analytics.trackSettings( this, isPro() );
+
+				handled = true;
 			}
 			else if( id == R.id.menu_item_share )
 			{
 				Analytics.trackShare( this, m_currentCategory, isPro() );
 				handled = super.onOptionsItemSelected( item );
+			}
+			else if( id == R.id.menu_item_about )
+			{
+				AboutFragment fragment = AboutFragment.newInstance();
+				fragment.show( getFragmentManager(), ABOUT_FRAGMENT_TAG );
+
+				handled = true;
 			}
 			else
 			{

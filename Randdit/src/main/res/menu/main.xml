@@ -3,8 +3,14 @@
       tools:context=".MainActivity">
 
     <item
-        android:id="@+id/action_settings"
-        android:title="@string/action_settings"
+        android:id="@+id/menu_item_settings"
+        android:title="@string/menu_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_item_about"
+        android:title="@string/menu_about"
         android:orderInCategory="100"
         android:showAsAction="never"/>
 </menu>
