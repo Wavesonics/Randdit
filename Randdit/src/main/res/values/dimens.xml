@@ -20,7 +20,6 @@
 
     <dimen name="intro_box_tablet_width">500sp</dimen>
     <dimen name="post_info_tablet_width">300sp</dimen>
-    <dimen name="post_info_tablet_height">200sp</dimen>
     <dimen name="fading_edge">4dp</dimen>
 
     <dimen name="pro_bullet_point">8dp</dimen>

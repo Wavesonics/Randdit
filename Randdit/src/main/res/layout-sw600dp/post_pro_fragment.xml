@@ -10,7 +10,7 @@
 
     <FrameLayout
         android:id="@+id/POST_post_info_container"
-        android:layout_height="@dimen/post_info_tablet_height"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"/>
 
     <FrameLayout
