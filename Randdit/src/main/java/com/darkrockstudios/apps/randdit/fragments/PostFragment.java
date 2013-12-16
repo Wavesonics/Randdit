@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
@@ -36,6 +37,7 @@ import com.darkrockstudios.apps.randdit.misc.NextButtonEnabler;
 import com.darkrockstudios.apps.randdit.misc.Post;
 import com.darkrockstudios.apps.randdit.misc.Preferences;
 import com.darkrockstudios.apps.randdit.misc.PurchaseScreenProvider;
+import com.darkrockstudios.apps.randdit.misc.Tips;
 import com.darkrockstudios.views.uriimageview.UriImageHandler;
 import com.darkrockstudios.views.uriimageview.UriImageView;
 import com.google.android.gms.ads.AdRequest;
@@ -53,10 +55,13 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	private static final boolean IS_API_19_OR_LATER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
 	private static final String FRAGMENT_TAG_POST_INFO = "PostInfoFragment";
+	private static final String FRAGMENT_TAG_TIP = "TipFragment";
 
 	private static final String ARG_PRO      = PostFragment.class.getName() + ".PRO";
 	private static final String ARG_POST     = PostFragment.class.getName() + ".POST";
 	private static final String ARG_CATEGORY = PostFragment.class.getName() + ".CATEGORY";
+
+	private Tips.Tip m_tip;
 
 	private boolean                  m_isPro;
 	private Post                     m_post;
@@ -125,6 +130,8 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 			View decorView = activity.getWindow().getDecorView();
 			decorView.setOnSystemUiVisibilityChangeListener( this );
 		}
+
+		m_tip = Tips.shouldShowTip( getActivity(), m_isPro );
 	}
 
 	@Override
@@ -137,6 +144,16 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		if( m_adView != null )
 		{
 			m_adView.resume();
+		}
+
+		if( m_tip != null )
+		{
+			DialogFragment tipDialog = Tips.constructTipDialog( m_tip );
+			if( tipDialog != null )
+			{
+				tipDialog.show( getFragmentManager(), FRAGMENT_TAG_TIP );
+				m_tip = null;
+			}
 		}
 	}
 

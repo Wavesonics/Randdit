@@ -10,4 +10,5 @@ public class Preferences
 	public static final String KEY_SHOW_WIFI_WARNING = "pref_key_wifi_warning";
 	public static final String KEY_IS_PRO            = "pref_key_is_pro";
 	public static final String KEY_APPEND_AD         = "pref_key_append_ad";
+	public static final String KEY_TIP_IDS_SHOWN     = "pref_key_tip_ids_shown";
 }

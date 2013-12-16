@@ -1,0 +1,68 @@
+{
+    "tips" :
+    [
+        {
+            "id" : "pinch_to_zoom",
+            "type" : "tip",
+            "image_threshold" : 5,
+            "title" : "Pinch to zoom",
+            "body" : "You can pinch to zoom on images and pan around"
+        },
+        {
+            "id" : "pro_1",
+            "type" : "pro",
+            "image_threshold" : 10,
+            "title" : "Remove Ads",
+            "body" : "If you go Pro, you can get rid of the Ads and have more room for images!"
+        },
+        {
+            "id" : "change_categories",
+            "type" : "tip",
+            "image_threshold" : 15,
+            "title" : "Categories",
+            "body" : "You can change categories by pulling the navigation drawer out from the left"
+        },
+        {
+            "id" : "restart_gifs",
+            "type" : "tip",
+            "image_threshold" : 20,
+            "title" : "Restart GIFs",
+            "body" : "You can tap an animated GIF to start it playing from the beginning again. Great for restarting to show other people!"
+        },
+        {
+            "id" : "rate_1",
+            "type" : "rate",
+            "image_threshold" : 50,
+            "title" : "5 Stars!",
+            "body" : "Looks like you're enjoying Randdit! If so, please rate us as you see fit on Google Play."
+        },
+        {
+            "id" : "download_image",
+            "type" : "tip",
+            "image_threshold" : 75,
+            "title" : "Download",
+            "body" : "You can download images from inside the app. Check out the settings menu!"
+        },
+        {
+            "id" : "100_images",
+            "type" : "tip",
+            "image_threshold" : 100,
+            "title" : "100 Images!",
+            "body" : "You have viewed 100 images! Thats awesome!"
+        },
+        {
+            "id" : "pro_2",
+            "type" : "pro",
+            "image_threshold" : 500,
+            "title" : "Set Wallpapers",
+            "body" : "Randdit Pro allows you to set images as your wallpaper from right inside the app! Works awesome in the Beautiful category."
+        },
+        {
+            "id" : "1000_images",
+            "type" : "tip",
+            "image_threshold" : 1000,
+            "title" : "!!1000 Images!!",
+            "body" : "Holy crap! You've viewed 1000 images! That's a lot!"
+        }
+    ]
+}

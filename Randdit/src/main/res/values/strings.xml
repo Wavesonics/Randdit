@@ -55,5 +55,8 @@
     <string name="about_body_github_giflib"><a href="https://github.com/koral--/android-gif-drawable">android-gif-drawable</a></string>
     <string name="about_body_github_photoview"><a href="https://github.com/chrisbanes/PhotoView">PhotoView</a></string>
     <string name="about_body_feedback"><i>Found a bug? Feature request?</i>\n<a href="https://github.com/Wavesonics/RandditTracker/issues/new">Log it here!</a></string>
+    <string name="tip_did_you_know">Did you know?</string>
+    <string name="tip_pro_button">Go Pro</string>
+    <string name="tip_rate_button">Rate Us</string>
 
 </resources>
