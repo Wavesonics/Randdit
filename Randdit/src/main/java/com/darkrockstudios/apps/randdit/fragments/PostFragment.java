@@ -55,7 +55,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	private static final boolean IS_API_19_OR_LATER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
 	private static final String FRAGMENT_TAG_POST_INFO = "PostInfoFragment";
-	private static final String FRAGMENT_TAG_TIP = "TipFragment";
+	private static final String FRAGMENT_TAG_TIP       = "TipFragment";
 
 	private static final String ARG_PRO      = PostFragment.class.getName() + ".PRO";
 	private static final String ARG_POST     = PostFragment.class.getName() + ".POST";
@@ -71,7 +71,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	private UriImageView             m_imageView;
 	private Button                   m_nextPostButton;
 	private UriImageHandler          m_imageHandler;
-	private AdView m_adView;
+	private AdView                   m_adView;
 
 	private PurchaseScreenProvider m_purchaseScreenProvider;
 
@@ -326,6 +326,8 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 					}
 					else if( m_purchaseScreenProvider != null )
 					{
+						Analytics.trackProClick( getActivity(), "set_wallpaper" );
+
 						m_purchaseScreenProvider.showPurchaseScreen();
 					}
 				}

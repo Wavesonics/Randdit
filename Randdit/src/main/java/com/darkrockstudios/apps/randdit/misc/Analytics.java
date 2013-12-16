@@ -123,16 +123,29 @@ public final class Analytics
 		);
 	}
 
-
-	public static void trackProClick( final Context context, final NavDrawerAdapter.NavItem category )
+	public static void trackProClick( final Context context, final String origin )
 	{
 		EasyTracker easyTracker = EasyTracker.getInstance( context );
 
-		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
+		easyTracker.set( Fields.customDimension( 3 ), origin );
 		easyTracker.send( MapBuilder
 				                  .createEvent( "ui_action",     // Event category (required)
 				                                "purchase_pro",  // Event action (required)
 				                                "Pro dialog presented",   // Event label
+				                                null )            // Event value
+				                  .build()
+		);
+	}
+
+	public static void trackRateClick( final Context context, final String origin )
+	{
+		EasyTracker easyTracker = EasyTracker.getInstance( context );
+
+		easyTracker.set( Fields.customDimension( 3 ), origin );
+		easyTracker.send( MapBuilder
+				                  .createEvent( "ui_action",     // Event category (required)
+				                                "rate_app",  // Event action (required)
+				                                "Google Play launched to rate the app",   // Event label
 				                                null )            // Event value
 				                  .build()
 		);

@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.darkrockstudios.apps.randdit.R;
+import com.darkrockstudios.apps.randdit.misc.Analytics;
 import com.darkrockstudios.apps.randdit.misc.PurchaseScreenProvider;
 import com.darkrockstudios.apps.randdit.misc.Tips;
 
@@ -118,6 +119,8 @@ public class TipFragment extends DialogFragment implements View.OnClickListener
 	{
 		if( v.getId() == R.id.TIP_pro_button )
 		{
+			Analytics.trackProClick( getActivity(), m_tip.id );
+
 			if( m_purchaseScreenProvider != null )
 			{
 				m_purchaseScreenProvider.showPurchaseScreen();
@@ -125,6 +128,8 @@ public class TipFragment extends DialogFragment implements View.OnClickListener
 		}
 		else if( v.getId() == R.id.TIP_rate_button )
 		{
+			Analytics.trackRateClick( getActivity(), m_tip.id );
+
 			Intent intent = new Intent( Intent.ACTION_VIEW );
 			intent.setData( Uri.parse( "market://details?id=com.darkrockstudios.apps.randdit" ) );
 			startActivity( intent );

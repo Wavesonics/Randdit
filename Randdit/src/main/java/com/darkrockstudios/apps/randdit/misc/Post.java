@@ -1,7 +1,6 @@
 package com.darkrockstudios.apps.randdit.misc;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * Created by Adam on 11/11/13.
@@ -21,4 +20,5 @@ public class Post implements Serializable
 	public String subreddit;
 	public String nsfwsub;
 	public String restricted;
+	public int    is_image;
 }

@@ -58,7 +58,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 
 	private static final String CONTENT_FRAGMENT_TAG  = "ContentFragment";
 	private static final String PURCHASE_FRAGMENT_TAG = "PurchaseFragment";
-	private static final String ABOUT_FRAGMENT_TAG = "AboutFragment";
+	private static final String ABOUT_FRAGMENT_TAG    = "AboutFragment";
 
 	private static final String SAVE_POSTS    = MainActivity.class.getName() + ".POSTS";
 	private static final String SAVE_NAV_ITEM = MainActivity.class.getName() + ".NAV_ITEM";
@@ -366,6 +366,8 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		}
 		else
 		{
+			Analytics.trackProClick( this, "nav_drawer" );
+
 			showPurchaseScreen();
 		}
 
