@@ -1,8 +1,11 @@
 package com.darkrockstudios.apps.randdit.fragments;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
@@ -66,7 +69,35 @@ public class AboutFragment extends DialogFragment implements View.OnClickListene
 		linkView.setMovementMethod( linkMovementMethod );
 		linkView.setText( getText( R.string.about_body_feedback ) );
 
+		TextView versionView = (TextView) view.findViewById( R.id.ABOUT_app_version );
+		versionView.setText( "v" + getAppVersion() );
+
 		return view;
+	}
+
+	private String getAppVersion()
+	{
+		String version = "-";
+
+		Activity activity = getActivity();
+		if( activity != null )
+		{
+			try
+			{
+				PackageManager pm = activity.getPackageManager();
+				if( pm != null )
+				{
+					PackageInfo pinfo = pm.getPackageInfo( activity.getPackageName(), 0 );
+					version = pinfo.versionName;
+				}
+			}
+			catch( PackageManager.NameNotFoundException e )
+			{
+				e.printStackTrace();
+			}
+		}
+
+		return version;
 	}
 
 	@Override
