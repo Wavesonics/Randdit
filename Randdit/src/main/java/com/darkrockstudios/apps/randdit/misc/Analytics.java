@@ -150,4 +150,31 @@ public final class Analytics
 				                  .build()
 		);
 	}
+
+	public static void trackAboutClick( final Context context, final NavDrawerAdapter.NavItem category )
+	{
+		EasyTracker easyTracker = EasyTracker.getInstance( context );
+
+		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
+		easyTracker.send( MapBuilder
+				                  .createEvent( "ui_action",     // Event category (required)
+				                                "about",  // Event action (required)
+				                                "About displayed",   // Event label
+				                                null )            // Event value
+				                  .build()
+		);
+	}
+
+	public static void trackViewOtherAppsClick( final Context context )
+	{
+		EasyTracker easyTracker = EasyTracker.getInstance( context );
+
+		easyTracker.send( MapBuilder
+				                  .createEvent( "ui_action",     // Event category (required)
+				                                "view_other_apps",  // Event action (required)
+				                                "View other Dark Rock Studios apps in Play Store",   // Event label
+				                                null )            // Event value
+				                  .build()
+		);
+	}
 }

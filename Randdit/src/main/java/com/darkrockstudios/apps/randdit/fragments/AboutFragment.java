@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.darkrockstudios.apps.randdit.R;
+import com.darkrockstudios.apps.randdit.misc.Analytics;
 
 
 public class AboutFragment extends DialogFragment implements View.OnClickListener
@@ -35,7 +36,6 @@ public class AboutFragment extends DialogFragment implements View.OnClickListene
 	public void onCreate( final Bundle savedInstanceState )
 	{
 		super.onCreate( savedInstanceState );
-
 	}
 
 	@Override
@@ -74,6 +74,8 @@ public class AboutFragment extends DialogFragment implements View.OnClickListene
 	{
 		if( v.getId() == R.id.ABOUT_market_button && isAdded() )
 		{
+			Analytics.trackViewOtherAppsClick( getActivity() );
+
 			Intent intent = new Intent( Intent.ACTION_VIEW );
 			intent.setData( Uri.parse( "market://search?q=pub:Dark+Rock+Studios" ) );
 			startActivity( intent );

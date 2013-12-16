@@ -203,6 +203,8 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			}
 			else if( id == R.id.menu_item_about )
 			{
+				Analytics.trackAboutClick( this, m_currentCategory );
+
 				AboutFragment fragment = AboutFragment.newInstance();
 				fragment.show( getFragmentManager(), ABOUT_FRAGMENT_TAG );
 
