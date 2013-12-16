@@ -18,21 +18,21 @@
         {
             "id" : "change_categories",
             "type" : "tip",
-            "image_threshold" : 15,
+            "image_threshold" : 20,
             "title" : "Categories",
             "body" : "You can change categories by pulling the navigation drawer out from the left"
         },
         {
             "id" : "restart_gifs",
             "type" : "tip",
-            "image_threshold" : 20,
+            "image_threshold" : 30,
             "title" : "Restart GIFs",
             "body" : "You can tap an animated GIF to start it playing from the beginning again. Great for restarting to show other people!"
         },
         {
             "id" : "rate_1",
             "type" : "rate",
-            "image_threshold" : 50,
+            "image_threshold" : 60,
             "title" : "5 Stars!",
             "body" : "Looks like you're enjoying Randdit! If so, please rate us as you see fit on Google Play."
         },
@@ -48,7 +48,7 @@
             "type" : "tip",
             "image_threshold" : 100,
             "title" : "100 Images!",
-            "body" : "You have viewed 100 images! Thats awesome!"
+            "body" : "You have viewed 100 images! That's awesome!"
         },
         {
             "id" : "pro_2",
