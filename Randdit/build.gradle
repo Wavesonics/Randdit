@@ -21,7 +21,6 @@ dependencies {
     compile 'com.android.support:support-v4:18.0.0'
     compile('de.keyboardsurfer.android.widget:crouton:1.8.1') {
         exclude module: 'support-v4'
-
     }
     compile files('libs/volley.jar')
     compile files('libs/libGoogleAnalyticsServices.jar')

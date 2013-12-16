@@ -331,9 +331,26 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		showPost();
 	}
 
+	private Post getPost()
+	{
+		Post post = null;
+
+		// Keep popping posts until we find an Image post
+		while( m_posts.size() > 0 && post == null )
+		{
+			Post nextPost = m_posts.pop();
+			if( nextPost.is_image == 1 )
+			{
+				post = nextPost;
+			}
+		}
+
+		return post;
+	}
+
 	private void showPost()
 	{
-		Post post = (m_posts.size() > 0 ? m_posts.pop() : null);
+		Post post = getPost();
 		if( post != null )
 		{
 			if( m_isActive )
