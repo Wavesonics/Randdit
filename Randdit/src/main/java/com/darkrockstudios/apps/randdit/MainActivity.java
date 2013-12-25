@@ -341,7 +341,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		while( m_posts.size() > 0 && post == null )
 		{
 			Post nextPost = m_posts.pop();
-			if( nextPost.is_image == 1 )
+			if( Post.isPostValid( nextPost ) && nextPost.is_image == 1 )
 			{
 				post = nextPost;
 			}

@@ -21,4 +21,22 @@ public class Post implements Serializable
 	public String nsfwsub;
 	public String restricted;
 	public int    is_image;
+
+	public static boolean isPostValid( final Post post )
+	{
+		boolean isValid = false;
+
+		if( post != null &&
+		    post.id != null &&
+		    post.title != null &&
+		    post.url != null &&
+		    post.author != null &&
+		    post.created != null &&
+		    post.permalink != null )
+		{
+			isValid = true;
+		}
+
+		return isValid;
+	}
 }

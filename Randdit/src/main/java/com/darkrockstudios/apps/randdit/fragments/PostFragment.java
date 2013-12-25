@@ -266,7 +266,11 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		// Fetch and store ShareActionProvider
 		m_shareActionProvider = (ShareActionProvider) item.getActionProvider();
 
-		setShareIntent( createShareIntent( m_post ) );
+		Intent shareIntent = createShareIntent( m_post );
+		if( shareIntent != null )
+		{
+			setShareIntent( shareIntent );
+		}
 	}
 
 	@Override
@@ -414,30 +418,40 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 
 	private Intent createShareIntent( final Post post )
 	{
-		Intent intent = new Intent( Intent.ACTION_SEND );
-		intent.setData( Uri.parse( post.url ) );
+		final Intent intent;
 
-		Activity activity = getActivity();
-		boolean appendAd = false;
-		if( activity != null )
+		if( post != null )
 		{
-			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( activity );
-			appendAd = settings.getBoolean( Preferences.KEY_APPEND_AD, true );
-		}
+			intent = new Intent( Intent.ACTION_SEND );
+			intent.setData( Uri.parse( post.url ) );
 
-		final int shareBodyResource;
-		if( appendAd )
-		{
-			shareBodyResource = R.string.share_body;
+			Activity activity = getActivity();
+			boolean appendAd = false;
+			if( activity != null )
+			{
+				SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( activity );
+				appendAd = settings.getBoolean( Preferences.KEY_APPEND_AD, true );
+			}
+
+			final int shareBodyResource;
+			if( appendAd )
+			{
+				shareBodyResource = R.string.share_body;
+			}
+			else
+			{
+				shareBodyResource = R.string.share_body_no_ad;
+			}
+
+			String shareBody =
+					getString( shareBodyResource, Html.fromHtml( post.title ), createRandditUrl( post, m_category ) );
+			intent.putExtra( Intent.EXTRA_TEXT, shareBody );
+			intent.setType( "image/*" );
 		}
 		else
 		{
-			shareBodyResource = R.string.share_body_no_ad;
+			intent = null;
 		}
-
-		String shareBody = getString( shareBodyResource, Html.fromHtml( post.title ), createRandditUrl( post, m_category ) );
-		intent.putExtra( Intent.EXTRA_TEXT, shareBody );
-		intent.setType( "image/*" );
 
 		return intent;
 	}
