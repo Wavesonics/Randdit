@@ -101,7 +101,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		m_posts = new LinkedList<>();
 
 		// Bug in API 14 where it is shown by default
-		setProgressBarIndeterminateVisibility( true );
+		setProgressBarIndeterminateVisibility( false );
 
 		final String postId = getPostFromIntent( getIntent() );
 		if( savedInstanceState != null )
