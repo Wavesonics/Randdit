@@ -15,13 +15,11 @@ repositories {
 dependencies {
     compile 'com.android.support:appcompat-v7:+'
     compile 'com.android.support:support-v13:+'
-    compile 'com.google.android.gms:play-services:4.0.30'
+    compile 'com.google.android.gms:play-services:4.1.32'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.github.chrisbanes.photoview:library:1.2.2'
-    compile 'com.android.support:support-v4:18.0.0'
-    compile('de.keyboardsurfer.android.widget:crouton:1.8.1') {
-        exclude module: 'support-v4'
-    }
+    compile 'de.keyboardsurfer.android.widget:crouton:1.8.2'
+
     compile files('libs/volley.jar')
     compile files('libs/libGoogleAnalyticsServices.jar')
     compile files('libs/android-gif-drawable-1.0.4.jar')
