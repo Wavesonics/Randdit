@@ -10,22 +10,56 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.io.Serializable;
+
 /**
  * Created by Adam on 11/22/13.
  */
 public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
 {
-	public static enum NavItem
+	public static NavItem CATEGORY_ALL = new NavItem( new CategoryDefinition( "all", "", 1 ) );
+
+	public static class NavItem implements Serializable
 	{
-		all,
-		new_,
-		funny,
-		cute,
-		beautiful,
-		gifs,
-		wtf,
-		pro
+		public final CategoryDefinition category;
+		public final boolean            pro;
+
+		public NavItem()
+		{
+			category = null;
+			pro = true;
+		}
+
+		public NavItem( final CategoryDefinition category )
+		{
+			this.category = category;
+			pro = false;
+		}
+
+		public String toString()
+		{
+			final String string;
+			if( !pro )
+			{
+				if( category != null && category.name != null )
+				{
+					string = category.name;
+				}
+				else
+				{
+					string = "Bad Category";
+				}
+			}
+			else
+			{
+				string = "Pro Ad";
+			}
+
+			return string;
+		}
 	}
+
+	private Categories m_categories;
 
 	private static final int TYPE_CATEGORY = 0;
 	private static final int TYPE_PRO_AD   = 1;
@@ -49,24 +83,35 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
 		m_isPro = isPro;
 	}
 
+	public void setCategories( final Categories categories )
+	{
+		m_categories = categories;
+		refreshNavItems();
+	}
+
 	public void refreshNavItems()
 	{
 		clear();
 
-		add( NavItem.all );
-		add( NavItem.new_ );
-		add( NavItem.funny );
-		add( NavItem.cute );
-		add( NavItem.beautiful );
-		add( NavItem.gifs );
-		if( wtfEnabled() )
+		if( m_categories != null )
 		{
-			add( NavItem.wtf );
+			final boolean wtfEnabled = wtfEnabled();
+			for( final CategoryDefinition definition : m_categories.categories )
+			{
+				if( definition.is_sfw == 1 )
+				{
+					add( new NavItem( definition ) );
+				}
+				else if( definition.is_sfw == 0 && wtfEnabled )
+				{
+					add( new NavItem( definition ) );
+				}
+			}
 		}
 
 		if( !m_isPro )
 		{
-			add( NavItem.pro );
+			add( new NavItem() );
 		}
 	}
 
@@ -87,7 +132,9 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
 	{
 		final int type;
 
-		if( !m_isPro && position == getCount() - 1 )
+		NavItem navItem = getItem( position );
+
+		if( !m_isPro && navItem.pro )
 		{
 			type = TYPE_PRO_AD;
 		}
@@ -154,35 +201,9 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
 	{
 		final String title;
 
-		if( item != null )
+		if( item != null && item.category != null )
 		{
-			switch( item )
-			{
-				case all:
-					title = "all";
-					break;
-				case new_:
-					title = "new";
-					break;
-				case funny:
-					title = "funny";
-					break;
-				case cute:
-					title = "cute";
-					break;
-				case beautiful:
-					title = "beautiful";
-					break;
-				case gifs:
-					title = "gifs";
-					break;
-				case wtf:
-					title = "wtf";
-					break;
-				default:
-					title = null;
-					break;
-			}
+			title = item.category.name;
 		}
 		else
 		{

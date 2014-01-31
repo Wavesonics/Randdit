@@ -33,6 +33,9 @@ import com.darkrockstudios.apps.randdit.fragments.IntroFragment;
 import com.darkrockstudios.apps.randdit.fragments.PostFragment;
 import com.darkrockstudios.apps.randdit.fragments.PurchaseProFragment;
 import com.darkrockstudios.apps.randdit.misc.Analytics;
+import com.darkrockstudios.apps.randdit.misc.Categories;
+import com.darkrockstudios.apps.randdit.misc.CategoryDefinition;
+import com.darkrockstudios.apps.randdit.misc.CategoryUtility;
 import com.darkrockstudios.apps.randdit.misc.NavDrawerAdapter;
 import com.darkrockstudios.apps.randdit.misc.NextButtonEnabler;
 import com.darkrockstudios.apps.randdit.misc.Post;
@@ -70,6 +73,8 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 
 	private NavDrawerAdapter.NavItem m_currentCategory;
 
+	private Categories m_categories;
+
 	private boolean m_isActive;
 
 	@Override
@@ -103,6 +108,16 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		// Bug in API 14 where it is shown by default
 		setProgressBarIndeterminateVisibility( false );
 
+		m_categories = CategoryUtility.getCategories( this );
+		if( m_categories == null )
+		{
+			requestCategories();
+		}
+		else
+		{
+			m_navDrawerAdapter.setCategories( m_categories );
+		}
+
 		final String postId = getPostFromIntent( getIntent() );
 		if( savedInstanceState != null )
 		{
@@ -131,6 +146,19 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		}
 	}
 
+	private void requestCategories()
+	{
+		setProgressBarIndeterminateVisibility( true );
+		setNextImageButtonEnabled( false );
+
+		final String url = "http://randdit.com/actions/get_default_categories.php";
+		CategoriesHandler responseHandler = new CategoriesHandler();
+		JsonObjectRequest jsObjRequest = new JsonObjectRequest( url, null, responseHandler, responseHandler );
+
+		RequestQueue requestQueue = RandditApplication.getRequestQueue();
+		requestQueue.add( jsObjRequest );
+	}
+
 	private String getPostFromIntent( final Intent intent )
 	{
 		String postId = null;
@@ -143,16 +171,17 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			{
 				Uri uri = intent.getData();
 				List<String> pathSegments = uri.getPathSegments();
-				if( pathSegments != null && pathSegments.size() > 1 )
+				if( pathSegments != null && pathSegments.size() > 1 && m_categories != null )
 				{
 					// We have a post at the point, so set our category
-					try
+					CategoryDefinition category = CategoryUtility.findByName( pathSegments.get( 0 ), m_categories );
+					if( category != null )
 					{
-						updateCategory( NavDrawerAdapter.NavItem.valueOf( pathSegments.get( 0 ) ) );
+						updateCategory( new NavDrawerAdapter.NavItem( category ) );
 					}
-					catch( IllegalArgumentException e )
+					else
 					{
-						updateCategory( NavDrawerAdapter.NavItem.all );
+						updateCategory( NavDrawerAdapter.CATEGORY_ALL );
 					}
 
 					postId = pathSegments.get( 1 );
@@ -285,30 +314,36 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 
 	private void requestPost( final String postId )
 	{
-		setProgressBarIndeterminateVisibility( true );
-		setNextImageButtonEnabled( false );
+		if( m_currentCategory != null )
+		{
+			setProgressBarIndeterminateVisibility( true );
+			setNextImageButtonEnabled( false );
 
-		final String url = "http://randdit.com/" + NavDrawerAdapter.getId( m_currentCategory ) + "/" + postId + "/?api";
-		RandditPostHandler responseHandler = new RandditPostHandler();
-		JsonObjectRequest jsObjRequest =
-				new JsonObjectRequest( url, null, responseHandler, responseHandler );
+			final String url = "http://randdit.com/" + NavDrawerAdapter.getId( m_currentCategory ) + "/" + postId + "/?api";
+			RandditPostHandler responseHandler = new RandditPostHandler();
+			JsonObjectRequest jsObjRequest =
+					new JsonObjectRequest( url, null, responseHandler, responseHandler );
 
-		RequestQueue requestQueue = RandditApplication.getRequestQueue();
-		requestQueue.add( jsObjRequest );
+			RequestQueue requestQueue = RandditApplication.getRequestQueue();
+			requestQueue.add( jsObjRequest );
+		}
 	}
 
 	private void requestPosts()
 	{
-		setProgressBarIndeterminateVisibility( true );
-		setNextImageButtonEnabled( false );
+		if( m_currentCategory != null )
+		{
+			setProgressBarIndeterminateVisibility( true );
+			setNextImageButtonEnabled( false );
 
-		final String url = "http://randdit.com/" + NavDrawerAdapter.getId( m_currentCategory ) + "/?api";
-		RandditPostHandler responseHandler = new RandditPostHandler();
-		JsonObjectRequest jsObjRequest =
-				new JsonObjectRequest( url, null, responseHandler, responseHandler );
+			final String url = "http://randdit.com/" + NavDrawerAdapter.getId( m_currentCategory ) + "/?api";
+			RandditPostHandler responseHandler = new RandditPostHandler();
+			JsonObjectRequest jsObjRequest =
+					new JsonObjectRequest( url, null, responseHandler, responseHandler );
 
-		RequestQueue requestQueue = RandditApplication.getRequestQueue();
-		requestQueue.add( jsObjRequest );
+			RequestQueue requestQueue = RandditApplication.getRequestQueue();
+			requestQueue.add( jsObjRequest );
+		}
 	}
 
 	private void setNextImageButtonEnabled( final boolean enabled )
@@ -329,7 +364,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	{
 		if( m_currentCategory == null )
 		{
-			updateCategory( NavDrawerAdapter.NavItem.all );
+			updateCategory( NavDrawerAdapter.CATEGORY_ALL );
 		}
 
 		Analytics.trackNextImageClick( this, m_currentCategory, isPro() );
@@ -355,22 +390,29 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 
 	private void showPost()
 	{
-		Post post = getPost();
-		if( post != null )
+		if( m_currentCategory != null )
 		{
-			if( m_isActive )
+			Post post = getPost();
+			if( post != null )
 			{
-				FragmentManager fragmentManager = getFragmentManager();
+				if( m_isActive )
+				{
+					FragmentManager fragmentManager = getFragmentManager();
 
-				PostFragment fragment = PostFragment.newInstance( post, isPro(), m_currentCategory );
-				fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
+					PostFragment fragment = PostFragment.newInstance( post, isPro(), m_currentCategory );
+					fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
 
-				updateNfcMessage( post );
+					updateNfcMessage( post );
+				}
+			}
+			else
+			{
+				requestPosts();
 			}
 		}
 		else
 		{
-			requestPosts();
+			requestCategories();
 		}
 	}
 
@@ -378,7 +420,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	public void onItemClick( final AdapterView<?> parent, final View view, final int position, final long id )
 	{
 		NavDrawerAdapter.NavItem navItem = m_navDrawerAdapter.getItem( position );
-		if( navItem != NavDrawerAdapter.NavItem.pro )
+		if( !navItem.pro )
 		{
 			m_currentCategory = navItem;
 			m_posts.clear();
@@ -572,7 +614,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 					}
 				}
 			}
-			catch( JSONException e )
+			catch( final JSONException e )
 			{
 				e.printStackTrace();
 			}
@@ -580,7 +622,14 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			{
 				setProgressBarIndeterminateVisibility( false );
 				setNextImageButtonEnabled( true );
-				showPost();
+				if( m_posts.size() > 0 )
+				{
+					showPost();
+				}
+				else
+				{
+					Crouton.makeText( MainActivity.this, R.string.toast_post_request_error, Style.ALERT ).show();
+				}
 			}
 		}
 
@@ -591,6 +640,36 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			Log.d( TAG, volleyError.toString() );
 
 			Crouton.makeText( MainActivity.this, R.string.toast_post_request_error, Style.ALERT ).show();
+
+			setProgressBarIndeterminateVisibility( false );
+			setNextImageButtonEnabled( true );
+		}
+	}
+
+	private class CategoriesHandler implements Response.Listener<JSONObject>, Response.ErrorListener
+	{
+		@Override
+		public void onErrorResponse( final VolleyError volleyError )
+		{
+			Log.d( TAG, "Failed to retrieve categories." );
+			Log.d( TAG, volleyError.toString() );
+
+			Crouton.makeText( MainActivity.this, R.string.toast_categories_failure, Style.ALERT ).show();
+
+			setProgressBarIndeterminateVisibility( false );
+			setNextImageButtonEnabled( true );
+		}
+
+		@Override
+		public void onResponse( final JSONObject jsonObject )
+		{
+			String categoriesStr = jsonObject.toString();
+			Gson gson = new Gson();
+			Categories categories = gson.fromJson( categoriesStr, Categories.class );
+			CategoryUtility.writeFile( categories, MainActivity.this );
+
+			m_categories = categories;
+			m_navDrawerAdapter.setCategories( m_categories );
 
 			setProgressBarIndeterminateVisibility( false );
 			setNextImageButtonEnabled( true );

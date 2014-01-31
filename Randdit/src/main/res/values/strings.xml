@@ -32,6 +32,7 @@
     <string name="toast_download_started">Download started</string>
     <string name="toast_wallpaper_failed">Failed to set wallpaper</string>
     <string name="toast_wallpaper_success">Wallpaper set!</string>
+    <string name="toast_categories_failure">Could not get Categories</string>
     <string name="postinfo_title">Post Info</string>
     <string name="postinfo_user">User: </string>
     <string name="postinfo_created">Created: </string>
