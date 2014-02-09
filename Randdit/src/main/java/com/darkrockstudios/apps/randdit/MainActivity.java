@@ -118,7 +118,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		m_categories = CategoryUtility.getCategories( this );
 		if( m_categories == null )
 		{
-			requestCategories();
+			requestCategories( false );
 		}
 		else
 		{
@@ -156,13 +156,13 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		}
 	}
 
-	private void requestCategories()
+	private void requestCategories( boolean showPostOnUpdate )
 	{
 		setProgressBarIndeterminateVisibility( true );
 		setNextImageButtonEnabled( false );
 
 		final String url = "http://randdit.com/actions/get_default_categories.php";
-		CategoriesHandler responseHandler = new CategoriesHandler();
+		CategoriesHandler responseHandler = new CategoriesHandler( showPostOnUpdate );
 		JsonObjectRequest jsObjRequest = new JsonObjectRequest( url, null, responseHandler, responseHandler );
 
 		RequestQueue requestQueue = RandditApplication.getRequestQueue();
@@ -376,13 +376,21 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 
 	public void onShowImageClicked( final View view )
 	{
-		if( m_currentCategory == null )
+		// Try to request categories if we have failed to get them by this point
+		if( m_categories == null )
 		{
-			updateCategory( NavDrawerAdapter.CATEGORY_ALL );
+			requestCategories( true );
 		}
+		else
+		{
+			if( m_currentCategory == null )
+			{
+				updateCategory( NavDrawerAdapter.CATEGORY_ALL );
+			}
 
-		Analytics.trackNextImageClick( this, m_currentCategory, isPro() );
-		showPost();
+			Analytics.trackNextImageClick( this, m_currentCategory, isPro() );
+			showPost();
+		}
 	}
 
 	private Post getPost()
@@ -419,39 +427,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 					updateNfcMessage( post );
 
 					// Unlock some achievements!
-					if( isSignedIn() )
-					{
-						long views = StatCounter.getImageViewCount( this );
-						if( views >= 100 )
-						{
-							Log.i( TAG, "Unlocking 100 Views Achievement" );
-							getGamesClient().unlockAchievement( getString( R.string.achievement_100_views ) );
-						}
-
-						if( views >= 500 )
-						{
-							Log.i( TAG, "Unlocking 500 Views Achievement" );
-							getGamesClient().unlockAchievement( getString( R.string.achievement_500_views ) );
-						}
-
-						if( views >= 1000 )
-						{
-							Log.i( TAG, "Unlocking 1000 Views Achievement" );
-							getGamesClient().unlockAchievement( getString( R.string.achievement_1000_views ) );
-						}
-
-						if( views >= 2000 )
-						{
-							Log.i( TAG, "Unlocking 2000 Views Achievement" );
-							getGamesClient().unlockAchievement( getString( R.string.achievement_2000_views ) );
-						}
-
-						if( views >= 5000 )
-						{
-							Log.i( TAG, "Unlocking 5000 Views Achievement" );
-							getGamesClient().unlockAchievement( getString( R.string.achievement_5000_views ) );
-						}
-					}
+					checkAchievements();
 				}
 			}
 			else
@@ -459,9 +435,42 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 				requestPosts();
 			}
 		}
-		else
+	}
+
+	private void checkAchievements()
+	{
+		if( isSignedIn() )
 		{
-			requestCategories();
+			long views = StatCounter.getImageViewCount( this );
+			if( views >= 100 )
+			{
+				Log.i( TAG, "Unlocking 100 Views Achievement" );
+				getGamesClient().unlockAchievement( getString( R.string.achievement_100_views ) );
+			}
+
+			if( views >= 500 )
+			{
+				Log.i( TAG, "Unlocking 500 Views Achievement" );
+				getGamesClient().unlockAchievement( getString( R.string.achievement_500_views ) );
+			}
+
+			if( views >= 1000 )
+			{
+				Log.i( TAG, "Unlocking 1000 Views Achievement" );
+				getGamesClient().unlockAchievement( getString( R.string.achievement_1000_views ) );
+			}
+
+			if( views >= 2000 )
+			{
+				Log.i( TAG, "Unlocking 2000 Views Achievement" );
+				getGamesClient().unlockAchievement( getString( R.string.achievement_2000_views ) );
+			}
+
+			if( views >= 5000 )
+			{
+				Log.i( TAG, "Unlocking 5000 Views Achievement" );
+				getGamesClient().unlockAchievement( getString( R.string.achievement_5000_views ) );
+			}
 		}
 	}
 
@@ -762,6 +771,13 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 
 	private class CategoriesHandler implements Response.Listener<JSONObject>, Response.ErrorListener
 	{
+		private final boolean m_getPostOnUpdate;
+
+		public CategoriesHandler( final boolean getPostOnUpdate )
+		{
+			m_getPostOnUpdate = getPostOnUpdate;
+		}
+
 		@Override
 		public void onErrorResponse( final VolleyError volleyError )
 		{
@@ -787,6 +803,18 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 
 			setProgressBarIndeterminateVisibility( false );
 			setNextImageButtonEnabled( true );
+
+			Crouton.makeText( MainActivity.this, R.string.toast_categories_success, Style.INFO ).show();
+
+			if( m_currentCategory == null )
+			{
+				updateCategory( NavDrawerAdapter.CATEGORY_ALL );
+			}
+
+			if( m_getPostOnUpdate )
+			{
+				showPost();
+			}
 		}
 	}
 }
