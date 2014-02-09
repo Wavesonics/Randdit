@@ -14,6 +14,7 @@ public class AdRequestBuilder
 		adBuilder.addTestDevice( "CAA9C926FB13FA7FEE6E98B745B46A39" ); // My GN
 		adBuilder.addTestDevice( "ADD12FD43C2481D9F9BACE38F280D31B" ); // MY TF201, Me
 		adBuilder.addTestDevice( "36CDCE2BA7F710EB8E8F68E3A46F780C" ); // My TF201, DRS
+		adBuilder.addTestDevice( "23FA550FBC944E62C2283D6D5DA2DC56" ); // My N5
 		adBuilder.tagForChildDirectedTreatment( false );
 
 		return adBuilder.build();
