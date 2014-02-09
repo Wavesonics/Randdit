@@ -9,23 +9,21 @@ import android.preference.PreferenceManager;
  */
 public class StatCounter
 {
-	private static final String KEY_IMAGE_VIEWS = "pref_key_image_views";
-
 	public static void countImageView( final Context context )
 	{
 		SharedPreferences stats = PreferenceManager.getDefaultSharedPreferences( context );
 
-		long views = Long.parseLong( stats.getString( KEY_IMAGE_VIEWS, "0" ) );
+		long views = Long.parseLong( stats.getString( Preferences.KEY_IMAGE_VIEWS, "0" ) );
 		++views;
 
 		SharedPreferences.Editor editor = stats.edit();
-		editor.putString( KEY_IMAGE_VIEWS, views + "" );
+		editor.putString( Preferences.KEY_IMAGE_VIEWS, views + "" );
 		editor.apply();
 	}
 
 	public static long getImageViewCount( final Context context )
 	{
 		SharedPreferences stats = PreferenceManager.getDefaultSharedPreferences( context );
-		return Long.parseLong( stats.getString( KEY_IMAGE_VIEWS, "0" ) );
+		return Long.parseLong( stats.getString( Preferences.KEY_IMAGE_VIEWS, "0" ) );
 	}
 }

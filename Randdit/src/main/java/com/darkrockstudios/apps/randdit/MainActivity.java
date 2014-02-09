@@ -32,6 +32,7 @@ import com.darkrockstudios.apps.randdit.fragments.AboutFragment;
 import com.darkrockstudios.apps.randdit.fragments.IntroFragment;
 import com.darkrockstudios.apps.randdit.fragments.PostFragment;
 import com.darkrockstudios.apps.randdit.fragments.PurchaseProFragment;
+import com.darkrockstudios.apps.randdit.googleplaygames.GameHelper;
 import com.darkrockstudios.apps.randdit.misc.Analytics;
 import com.darkrockstudios.apps.randdit.misc.Categories;
 import com.darkrockstudios.apps.randdit.misc.CategoryDefinition;
@@ -41,8 +42,10 @@ import com.darkrockstudios.apps.randdit.misc.NextButtonEnabler;
 import com.darkrockstudios.apps.randdit.misc.Post;
 import com.darkrockstudios.apps.randdit.misc.Preferences;
 import com.darkrockstudios.apps.randdit.misc.PurchaseScreenProvider;
+import com.darkrockstudios.apps.randdit.misc.StatCounter;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
+import com.google.android.gms.games.GamesClient;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -65,6 +68,8 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 
 	private static final String SAVE_POSTS    = MainActivity.class.getName() + ".POSTS";
 	private static final String SAVE_NAV_ITEM = MainActivity.class.getName() + ".NAV_ITEM";
+
+	private static final int REQUEST_LEADERBOARD = 3;
 
 	private LinkedList<Post> m_posts;
 
@@ -117,6 +122,9 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		{
 			m_navDrawerAdapter.setCategories( m_categories );
 		}
+
+		m_navDrawerAdapter.setGameHelper( mHelper );
+		m_navDrawerAdapter.setSignedIn( mHelper.isSignedIn() );
 
 		final String postId = getPostFromIntent( getIntent() );
 		if( savedInstanceState != null )
@@ -261,9 +269,11 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	@Override
 	public void onStop()
 	{
-		super.onStop();
-
 		EasyTracker.getInstance( this ).activityStop( this );
+
+		submitScores();
+
+		super.onStop();
 	}
 
 	@Override
@@ -290,6 +300,8 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		{
 			presentDataWarning();
 		}
+
+		beginUserInitiatedSignIn();
 	}
 
 	@Override
@@ -420,7 +432,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	public void onItemClick( final AdapterView<?> parent, final View view, final int position, final long id )
 	{
 		NavDrawerAdapter.NavItem navItem = m_navDrawerAdapter.getItem( position );
-		if( !navItem.pro )
+		if( navItem.isCategory )
 		{
 			m_currentCategory = navItem;
 			m_posts.clear();
@@ -430,9 +442,21 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		}
 		else
 		{
-			Analytics.trackProClick( this, "nav_drawer" );
+			switch( navItem.type )
+			{
+				case ProAd:
+					Analytics.trackProClick( this, "nav_drawer" );
 
-			showPurchaseScreen();
+					showPurchaseScreen();
+					break;
+				case Leaderboards:
+
+					submitScores();
+					startActivityForResult( mHelper.getGamesClient()
+					                               .getLeaderboardIntent( getString( R.string.leaderboard_views ) ),
+					                        REQUEST_LEADERBOARD );
+					break;
+			}
 		}
 
 		m_drawerLayout.closeDrawer( m_navDrawerView );
@@ -568,6 +592,52 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 				startActivity( intent );
 			}
 			finish();
+		}
+	}
+
+	@Override
+	public void onSignInFailed()
+	{
+		Log.d( TAG, "Google Games onSignInFailed" );
+
+		if( hasSignInError() )
+		{
+			GameHelper.SignInFailureReason reason = getSignInError();
+			Log.d( TAG, "ServiceError: " + reason );
+		}
+		else
+		{
+			Log.d( TAG, "No sign in error available" );
+		}
+
+		m_navDrawerAdapter.setSignedIn( false );
+		m_navDrawerAdapter.refreshNavItems();
+
+		Crouton.makeText( this, R.string.toast_signin_failed, Style.ALERT );
+	}
+
+	@Override
+	public void onSignInSucceeded()
+	{
+		Log.d( TAG, "Google Games onSignInSucceeded" );
+
+		m_navDrawerAdapter.setSignedIn( true );
+		m_navDrawerAdapter.refreshNavItems();
+
+		Crouton.makeText( this, R.string.toast_signin_success, Style.CONFIRM );
+	}
+
+	private void submitScores()
+	{
+		if( isSignedIn() )
+		{
+			final long allTimeViews = StatCounter.getImageViewCount( this );
+			if( allTimeViews > 0 )
+			{
+				Log.d( TAG, "Submitting all time view score: " + allTimeViews );
+				GamesClient gamesClient = getGamesClient();
+				gamesClient.submitScore( getString( R.string.leaderboard_views ), allTimeViews );
+			}
 		}
 	}
 

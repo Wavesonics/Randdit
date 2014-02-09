@@ -16,6 +16,8 @@
     <string name="pref_summary_append_ad">Disabling this give you shorter share text [Pro Feature]</string>
     <string name="pref_stats_title">Stats</string>
     <string name="pref_image_views_title">Images Viewed</string>
+    <string name="pref_signout_title">Sign Out</string>
+    <string name="pref_signout_summary">Sign out of Google Play to stop tracking stats and leaderboards</string>
     <string name="toast_post_request_error">Failed to retrieve posts</string>
     <string name="intro_1">1. See those categories over in the Nav Drawer? Click on those to get interesting images in the category you want to see</string>
     <string name="intro_2">2. Click "Show me another image!" at the bottom to see more!</string>
@@ -58,5 +60,12 @@
     <string name="tip_did_you_know">Did you know?</string>
     <string name="tip_pro_button">Go Pro</string>
     <string name="tip_rate_button">Rate Us</string>
+    <string name="nav_pro_title">Go Pro</string>
+    <string name="nav_pro_summary">Remove Ads!</string>
+    <string name="nav_pro_leaderboards">Leaderboards!</string>
+    <string name="toast_signin_failed">Failed to Sign In :(</string>
+    <string name="toast_signin_success">Signed In!</string>
+    <string name="toast_signout">Signing Out</string>
+    <string name="toast_not_signed_in">You aren\'t signed in silly!</string>
 
 </resources>

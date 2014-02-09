@@ -147,7 +147,7 @@ public class Tips
 			final long imagesViewed = StatCounter.getImageViewCount( context );
 			List<String> tipIdsShown = getShownTips( context );
 
-			for( Tip tip : tips )
+			for( final Tip tip : tips )
 			{
 				if( imagesViewed >= tip.image_threshold && !tipIdsShown.contains( tip.id ) )
 				{

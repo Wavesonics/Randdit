@@ -25,6 +25,11 @@
     <PreferenceCategory
         android:title="@string/pref_stats_title"
         android:key="pref_key_storage_stats">
+        <com.darkrockstudios.apps.randdit.misc.BroadcastPreference
+            android:title="@string/pref_signout_title"
+            android:summary="@string/pref_signout_summary">
+            <intent android:action="com.darkrockstudios.apps.randdit.SIGN_OUT"/>
+        </com.darkrockstudios.apps.randdit.misc.BroadcastPreference>
         <com.darkrockstudios.apps.randdit.misc.StatsPreference
             android:title="@string/pref_image_views_title"
             android:key="pref_key_image_views"

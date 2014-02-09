@@ -10,36 +10,50 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.darkrockstudios.apps.randdit.R;
+import com.darkrockstudios.apps.randdit.googleplaygames.GameHelper;
+import com.google.android.gms.common.SignInButton;
+
 import java.io.Serializable;
 
 /**
  * Created by Adam on 11/22/13.
  */
-public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
+public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> implements View.OnClickListener
 {
 	public static NavItem CATEGORY_ALL = new NavItem( new CategoryDefinition( "all", "", 1 ) );
+
+	public static enum OtherNavItemType
+	{
+		GoogleSignIn,
+		Leaderboards,
+		ProAd
+	}
 
 	public static class NavItem implements Serializable
 	{
 		public final CategoryDefinition category;
-		public final boolean            pro;
+		public final boolean          isCategory;
+		public final OtherNavItemType type;
 
-		public NavItem()
+		public NavItem( final OtherNavItemType type )
 		{
 			category = null;
-			pro = true;
+			isCategory = false;
+			this.type = type;
 		}
 
 		public NavItem( final CategoryDefinition category )
 		{
 			this.category = category;
-			pro = false;
+			isCategory = true;
+			type = null;
 		}
 
 		public String toString()
 		{
 			final String string;
-			if( !pro )
+			if( !isCategory )
 			{
 				if( category != null && category.name != null )
 				{
@@ -52,20 +66,24 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
 			}
 			else
 			{
-				string = "Pro Ad";
+				string = type.toString();
 			}
 
 			return string;
 		}
 	}
 
+	private GameHelper m_helper;
 	private Categories m_categories;
 
-	private static final int TYPE_CATEGORY = 0;
-	private static final int TYPE_PRO_AD   = 1;
-	private static final int TYPE_COUNT    = 2;
+	private static final int TYPE_CATEGORY    = 0;
+	private static final int TYPE_SIGN_IN     = 1;
+	private static final int TYPE_LEADERBOARD = 2;
+	private static final int TYPE_PRO_AD      = 3;
+	private static final int TYPE_COUNT       = 4;
 
 	private boolean m_isPro;
+	private boolean m_signedIn;
 
 	public NavDrawerAdapter( final Context context )
 	{
@@ -73,9 +91,13 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
 
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( context );
 		m_isPro = settings.getBoolean( Preferences.KEY_IS_PRO, false );
-		;
 
 		refreshNavItems();
+	}
+
+	public void setSignedIn( final boolean signedIn )
+	{
+		m_signedIn = signedIn;
 	}
 
 	public void setPro( final boolean isPro )
@@ -87,6 +109,11 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
 	{
 		m_categories = categories;
 		refreshNavItems();
+	}
+
+	public void setGameHelper( final GameHelper helper )
+	{
+		m_helper = helper;
 	}
 
 	public void refreshNavItems()
@@ -109,9 +136,18 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
 			}
 		}
 
+		if( !m_signedIn )
+		{
+			add( new NavItem( OtherNavItemType.GoogleSignIn ) );
+		}
+		else
+		{
+			add( new NavItem( OtherNavItemType.Leaderboards ) );
+		}
+
 		if( !m_isPro )
 		{
-			add( new NavItem() );
+			add( new NavItem( OtherNavItemType.ProAd ) );
 		}
 	}
 
@@ -134,9 +170,22 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
 
 		NavItem navItem = getItem( position );
 
-		if( !m_isPro && navItem.pro )
+		if( !navItem.isCategory )
 		{
-			type = TYPE_PRO_AD;
+			switch( navItem.type )
+			{
+				case GoogleSignIn:
+					type = TYPE_SIGN_IN;
+					break;
+				case Leaderboards:
+					type = TYPE_LEADERBOARD;
+					break;
+				case ProAd:
+					type = TYPE_PRO_AD;
+					break;
+				default:
+					throw new Error( "Bad nav item: " + navItem.type );
+			}
 		}
 		else
 		{
@@ -160,12 +209,17 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
 				case TYPE_CATEGORY:
 					view = inflater.inflate( android.R.layout.simple_list_item_1, parent, false );
 					break;
+				case TYPE_SIGN_IN:
+					view = inflater.inflate( R.layout.nav_drawer_item_signin, parent, false );
+					break;
+				case TYPE_LEADERBOARD:
+					view = inflater.inflate( android.R.layout.simple_list_item_1, parent, false );
+					break;
 				case TYPE_PRO_AD:
 				default:
 					view = inflater.inflate( android.R.layout.simple_list_item_2, parent, false );
 					break;
 			}
-
 		}
 		else
 		{
@@ -183,15 +237,28 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
 					titleView.setText( title );
 				}
 				break;
-			case TYPE_PRO_AD:
+			case TYPE_SIGN_IN:
+				SignInButton signInButton = (SignInButton) view.findViewById( R.id.sign_in_button );
+				signInButton.setOnClickListener( this );
+				break;
+			case TYPE_LEADERBOARD:
+			{
 				TextView titleView = (TextView) view.findViewById( android.R.id.text1 );
 				titleView.setTextColor( Color.WHITE );
-				titleView.setText( "Go Pro" );
+				titleView.setText( R.string.nav_pro_leaderboards );
+			}
+			break;
+			case TYPE_PRO_AD:
+			{
+				TextView titleView = (TextView) view.findViewById( android.R.id.text1 );
+				titleView.setTextColor( Color.WHITE );
+				titleView.setText( R.string.nav_pro_title );
 
 				TextView subtitleView = (TextView) view.findViewById( android.R.id.text2 );
 				subtitleView.setTextColor( Color.WHITE );
-				subtitleView.setText( "Remove Ads!" );
-				break;
+				subtitleView.setText( R.string.nav_pro_summary );
+			}
+			break;
 		}
 
 		return view;
@@ -211,5 +278,14 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem>
 		}
 
 		return title;
+	}
+
+	@Override
+	public void onClick( final View v )
+	{
+		if( m_helper != null )
+		{
+			m_helper.beginUserInitiatedSignIn();
+		}
 	}
 }

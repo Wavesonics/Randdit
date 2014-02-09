@@ -1,6 +1,5 @@
 package com.darkrockstudios.apps.randdit;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,6 +15,7 @@ import android.util.Log;
 
 import com.android.vending.billing.IInAppBillingService;
 import com.darkrockstudios.apps.randdit.billing.BillingSecurity;
+import com.darkrockstudios.apps.randdit.googleplaygames.BaseGameActivity;
 import com.darkrockstudios.apps.randdit.misc.Preferences;
 import com.darkrockstudios.apps.randdit.misc.PurchaseProvider;
 
@@ -28,7 +28,7 @@ import java.util.Date;
 /**
  * Created by Adam on 12/10/13.
  */
-public class BillingActivity extends Activity implements PurchaseProvider
+public abstract class BillingActivity extends BaseGameActivity implements PurchaseProvider
 {
 	private static final String TAG             = BillingActivity.class.getSimpleName();
 	private static final String PRODUCT_SKU_PRO = "randdit_pro";
@@ -221,6 +221,8 @@ public class BillingActivity extends Activity implements PurchaseProvider
 	@Override
 	protected void onActivityResult( final int requestCode, final int resultCode, final Intent data )
 	{
+		super.onActivityResult( requestCode, resultCode, data );
+
 		if( requestCode == 1001 )
 		{
 			int responseCode = data.getIntExtra( "RESPONSE_CODE", 0 );
