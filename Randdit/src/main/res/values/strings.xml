@@ -62,6 +62,8 @@
     <string name="tip_did_you_know">Did you know?</string>
     <string name="tip_pro_button">Go Pro</string>
     <string name="tip_rate_button">Rate Us</string>
+    <string name="nav_section_categories">Categories</string>
+    <string name="nav_section_randdit">Randdit</string>
     <string name="nav_pro_title">Go Pro</string>
     <string name="nav_pro_summary">Remove Ads!</string>
     <string name="nav_pro_leaderboards">Leaderboards!</string>

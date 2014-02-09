@@ -25,6 +25,7 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 
 	public static enum OtherNavItemType
 	{
+		SectionHeader,
 		GoogleSignIn,
 		Leaderboards,
 		ProAd
@@ -35,12 +36,22 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 		public final CategoryDefinition category;
 		public final boolean          isCategory;
 		public final OtherNavItemType type;
+		public final String           headerTitle;
 
 		public NavItem( final OtherNavItemType type )
 		{
 			category = null;
 			isCategory = false;
 			this.type = type;
+			headerTitle = null;
+		}
+
+		public NavItem( final String title )
+		{
+			category = null;
+			isCategory = false;
+			this.type = OtherNavItemType.SectionHeader;
+			headerTitle = title;
 		}
 
 		public NavItem( final CategoryDefinition category )
@@ -48,6 +59,7 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 			this.category = category;
 			isCategory = true;
 			type = null;
+			headerTitle = null;
 		}
 
 		public String toString()
@@ -77,10 +89,11 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 	private Categories m_categories;
 
 	private static final int TYPE_CATEGORY    = 0;
-	private static final int TYPE_SIGN_IN     = 1;
-	private static final int TYPE_LEADERBOARD = 2;
-	private static final int TYPE_PRO_AD      = 3;
-	private static final int TYPE_COUNT       = 4;
+	private static final int TYPE_SECTION     = 1;
+	private static final int TYPE_SIGN_IN     = 2;
+	private static final int TYPE_LEADERBOARD = 3;
+	private static final int TYPE_PRO_AD      = 4;
+	private static final int TYPE_COUNT       = 5;
 
 	private boolean m_isPro;
 	private boolean m_signedIn;
@@ -122,6 +135,8 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 
 		if( m_categories != null )
 		{
+			add( new NavItem( getContext().getString( R.string.nav_section_categories ) ) );
+
 			final boolean wtfEnabled = wtfEnabled();
 			for( final CategoryDefinition definition : m_categories.categories )
 			{
@@ -135,6 +150,8 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 				}
 			}
 		}
+
+		add( new NavItem( getContext().getString( R.string.nav_section_randdit ) ) );
 
 		if( !m_signedIn )
 		{
@@ -158,6 +175,36 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 	}
 
 	@Override
+	public boolean areAllItemsEnabled()
+	{
+		return false;
+	}
+
+	public boolean isEnabled( final int position )
+	{
+		final boolean enabled;
+
+		NavItem item = getItem( position );
+		if( item != null )
+		{
+			if( item.type == OtherNavItemType.SectionHeader )
+			{
+				enabled = false;
+			}
+			else
+			{
+				enabled = true;
+			}
+		}
+		else
+		{
+			enabled = false;
+		}
+
+		return enabled;
+	}
+
+	@Override
 	public int getViewTypeCount()
 	{
 		return TYPE_COUNT;
@@ -174,6 +221,9 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 		{
 			switch( navItem.type )
 			{
+				case SectionHeader:
+					type = TYPE_SECTION;
+					break;
 				case GoogleSignIn:
 					type = TYPE_SIGN_IN;
 					break;
@@ -206,6 +256,9 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 			LayoutInflater inflater = LayoutInflater.from( getContext() );
 			switch( type )
 			{
+				case TYPE_SECTION:
+					view = inflater.inflate( R.layout.nav_drawer_item_section, parent, false );
+					break;
 				case TYPE_CATEGORY:
 					view = inflater.inflate( android.R.layout.simple_list_item_1, parent, false );
 					break;
@@ -228,6 +281,14 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 
 		switch( type )
 		{
+			case TYPE_SECTION:
+			{
+				NavItem item = getItem( position );
+
+				TextView titleView = (TextView) view.findViewById( R.id.NAV_section_title );
+				titleView.setText( item.headerTitle );
+			}
+			break;
 			case TYPE_CATEGORY:
 				String title = getId( getItem( position ) );
 				if( title != null )
