@@ -415,6 +415,41 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 					fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
 
 					updateNfcMessage( post );
+
+					// Unlock some achievements!
+					if( isSignedIn() )
+					{
+						long views = StatCounter.getImageViewCount( this );
+						if( views >= 100 )
+						{
+							Log.i( TAG, "Unlocking 100 Views Achievement" );
+							getGamesClient().unlockAchievement( getString( R.string.achievement_100_views ) );
+						}
+
+						if( views >= 500 )
+						{
+							Log.i( TAG, "Unlocking 500 Views Achievement" );
+							getGamesClient().unlockAchievement( getString( R.string.achievement_500_views ) );
+						}
+
+						if( views >= 1000 )
+						{
+							Log.i( TAG, "Unlocking 1000 Views Achievement" );
+							getGamesClient().unlockAchievement( getString( R.string.achievement_1000_views ) );
+						}
+
+						if( views >= 2000 )
+						{
+							Log.i( TAG, "Unlocking 2000 Views Achievement" );
+							getGamesClient().unlockAchievement( getString( R.string.achievement_2000_views ) );
+						}
+
+						if( views >= 5000 )
+						{
+							Log.i( TAG, "Unlocking 5000 Views Achievement" );
+							getGamesClient().unlockAchievement( getString( R.string.achievement_5000_views ) );
+						}
+					}
 				}
 			}
 			else
