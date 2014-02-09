@@ -15,9 +15,15 @@
             android:title="@string/pref_title_show_wtf"
             android:defaultValue="false"/>
         <CheckBoxPreference
+            android:key="pref_key_share_text"
+            android:title="@string/pref_summary_share_text"
+            android:summary="@string/pref_title_share_text"
+            android:defaultValue="false"/>
+        <CheckBoxPreference
             android:key="pref_key_append_ad"
             android:summary="@string/pref_summary_append_ad"
             android:title="@string/pref_title_append_ad"
+            android:dependency="pref_key_share_text"
             android:defaultValue="true"/>
 
     </PreferenceCategory>

@@ -427,26 +427,36 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 
 			Activity activity = getActivity();
 			boolean appendAd = false;
+			boolean shareText = false;
 			if( activity != null )
 			{
 				SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( activity );
 				appendAd = settings.getBoolean( Preferences.KEY_APPEND_AD, true );
+				shareText = settings.getBoolean( Preferences.KEY_SHARE_TEXT, false );
 			}
 
-			final int shareBodyResource;
-			if( appendAd )
+			final String shareBody;
+			if( shareText )
 			{
-				shareBodyResource = R.string.share_body;
+				final int shareBodyResource;
+				if( appendAd )
+				{
+					shareBodyResource = R.string.share_body;
+				}
+				else
+				{
+					shareBodyResource = R.string.share_body_no_ad;
+				}
+
+				shareBody = getString( shareBodyResource, Html.fromHtml( post.title ), createRandditUrl( post, m_category ) );
 			}
 			else
 			{
-				shareBodyResource = R.string.share_body_no_ad;
+				shareBody = createRandditUrl( post, m_category );
 			}
 
-			String shareBody =
-					getString( shareBodyResource, Html.fromHtml( post.title ), createRandditUrl( post, m_category ) );
 			intent.putExtra( Intent.EXTRA_TEXT, shareBody );
-			intent.setType( "image/*" );
+			intent.setType( "text/plain" );
 		}
 		else
 		{

@@ -16,6 +16,8 @@
     <string name="pref_summary_append_ad">Disabling this give you shorter share text [Pro Feature]</string>
     <string name="pref_stats_title">Stats</string>
     <string name="pref_image_views_title">Images Viewed</string>
+    <string name="pref_summary_share_text">Share Title and URL</string>
+    <string name="pref_title_share_text">Turn off for sharing to Facebook. On for the rest of the world. The Facebook app is broken. Seriously. And they won\'t fix it.</string>
     <string name="pref_signout_title">Sign Out</string>
     <string name="pref_signout_summary">Sign out of Google Play to stop tracking stats and leaderboards</string>
     <string name="toast_post_request_error">Failed to retrieve posts</string>
