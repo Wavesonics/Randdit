@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -69,7 +70,8 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	private static final String SAVE_POSTS    = MainActivity.class.getName() + ".POSTS";
 	private static final String SAVE_NAV_ITEM = MainActivity.class.getName() + ".NAV_ITEM";
 
-	private static final int REQUEST_LEADERBOARD = 3;
+	private static final int REQUEST_LEADERBOARD  = 31;
+	private static final int REQUEST_ACHIEVEMENTS = 42;
 
 	private LinkedList<Post> m_posts;
 
@@ -485,11 +487,18 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 					showPurchaseScreen();
 					break;
 				case Leaderboards:
+					m_drawerLayout.closeDrawer( Gravity.LEFT );
 
 					submitScores();
 					startActivityForResult( mHelper.getGamesClient()
 					                               .getLeaderboardIntent( getString( R.string.leaderboard_views ) ),
 					                        REQUEST_LEADERBOARD );
+
+					break;
+				case Achievements:
+					m_drawerLayout.closeDrawer( Gravity.LEFT );
+
+					startActivityForResult( mHelper.getGamesClient().getAchievementsIntent(), REQUEST_ACHIEVEMENTS );
 					break;
 			}
 		}

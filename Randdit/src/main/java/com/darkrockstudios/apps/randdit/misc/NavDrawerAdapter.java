@@ -28,6 +28,7 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 		SectionHeader,
 		GoogleSignIn,
 		Leaderboards,
+		Achievements,
 		ProAd
 	}
 
@@ -88,12 +89,13 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 	private GameHelper m_helper;
 	private Categories m_categories;
 
-	private static final int TYPE_CATEGORY    = 0;
-	private static final int TYPE_SECTION     = 1;
-	private static final int TYPE_SIGN_IN     = 2;
-	private static final int TYPE_LEADERBOARD = 3;
-	private static final int TYPE_PRO_AD      = 4;
-	private static final int TYPE_COUNT       = 5;
+	private static final int TYPE_CATEGORY     = 0;
+	private static final int TYPE_SECTION      = 1;
+	private static final int TYPE_SIGN_IN      = 2;
+	private static final int TYPE_LEADERBOARD  = 3;
+	private static final int TYPE_ACHIEVEMENTS = 4;
+	private static final int TYPE_PRO_AD       = 5;
+	private static final int TYPE_COUNT        = 6;
 
 	private boolean m_isPro;
 	private boolean m_signedIn;
@@ -160,6 +162,7 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 		else
 		{
 			add( new NavItem( OtherNavItemType.Leaderboards ) );
+			add( new NavItem( OtherNavItemType.Achievements ) );
 		}
 
 		if( !m_isPro )
@@ -230,6 +233,9 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 				case Leaderboards:
 					type = TYPE_LEADERBOARD;
 					break;
+				case Achievements:
+					type = TYPE_ACHIEVEMENTS;
+					break;
 				case ProAd:
 					type = TYPE_PRO_AD;
 					break;
@@ -266,6 +272,9 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 					view = inflater.inflate( R.layout.nav_drawer_item_signin, parent, false );
 					break;
 				case TYPE_LEADERBOARD:
+					view = inflater.inflate( android.R.layout.simple_list_item_1, parent, false );
+					break;
+				case TYPE_ACHIEVEMENTS:
 					view = inflater.inflate( android.R.layout.simple_list_item_1, parent, false );
 					break;
 				case TYPE_PRO_AD:
@@ -306,7 +315,14 @@ public class NavDrawerAdapter extends ArrayAdapter<NavDrawerAdapter.NavItem> imp
 			{
 				TextView titleView = (TextView) view.findViewById( android.R.id.text1 );
 				titleView.setTextColor( Color.WHITE );
-				titleView.setText( R.string.nav_pro_leaderboards );
+				titleView.setText( R.string.nav_leaderboards );
+			}
+			break;
+			case TYPE_ACHIEVEMENTS:
+			{
+				TextView titleView = (TextView) view.findViewById( android.R.id.text1 );
+				titleView.setTextColor( Color.WHITE );
+				titleView.setText( R.string.nav_achievements );
 			}
 			break;
 			case TYPE_PRO_AD:
