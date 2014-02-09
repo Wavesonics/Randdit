@@ -10,6 +10,9 @@ apply plugin: 'android'
 
 repositories {
     mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
@@ -20,9 +23,10 @@ dependencies {
     compile 'com.github.chrisbanes.photoview:library:1.2.2'
     compile 'de.keyboardsurfer.android.widget:crouton:1.8.2'
 
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.0.5@aar'
+
     compile files('libs/volley.jar')
     compile files('libs/libGoogleAnalyticsServices.jar')
-    compile files('libs/android-gif-drawable-1.0.4.jar')
 }
 
 android {
