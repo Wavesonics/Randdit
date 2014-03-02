@@ -10,6 +10,11 @@
             android:title="@string/pref_title_keep_screen_on"
             android:defaultValue="true"/>
         <CheckBoxPreference
+            android:key="pref_key_display_ads"
+            android:summary="@string/pref_summary_display_ads"
+            android:title="@string/pref_title_display_ads"
+            android:defaultValue="false"/>
+        <CheckBoxPreference
             android:key="pref_key_show_wtf"
             android:summary="@string/pref_summary_show_wtf"
             android:title="@string/pref_title_show_wtf"

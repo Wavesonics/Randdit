@@ -10,6 +10,10 @@
     <string name="pref_general_title">General</string>
     <string name="pref_title_keep_screen_on">Keep screen on</string>
     <string name="pref_summary_keep_screen_on">Prevent the screen from turning off while using Randdit</string>
+
+    <string name="pref_title_display_ads">Display Ads</string>
+    <string name="pref_summary_display_ads">Don\'t feel like going pro? Support your dev another way!</string>
+
     <string name="pref_title_show_wtf">Show the WTF category</string>
     <string name="pref_summary_show_wtf">The WTF category contains NSFW and adult material, by showing it you agree to see some weird shit</string>
     <string name="pref_title_append_ad">Append Randdit to shares</string>
@@ -44,9 +48,9 @@
     <string name="postinfo_no_creation_date">unknown</string>
     <string name="PRO_title">Purchase Pro</string>
     <string name="PRO_header">Why go Pro?</string>
-    <string name="PRO_point_1">No Ads! That means more screen space for Doge!</string>
-    <string name="PRO_point_2">Set images as your Wallpaper directly from Randdit</string>
-    <string name="PRO_point_3">Option to disable the Randdit text when sharing links</string>
+    <string name="PRO_point_1">Set images as your Wallpaper directly from Randdit</string>
+    <string name="PRO_point_2">Option to disable the Randdit text when sharing links</string>
+    <string name="PRO_point_3">Support your dev!</string>
     <string name="PRO_point_4">More to come!</string>
     <string name="PRO_purchase_button">Purchase Pro Now!</string>
     <string name="about_title">About</string>
@@ -66,7 +70,7 @@
     <string name="nav_section_categories">Categories</string>
     <string name="nav_section_randdit">Randdit</string>
     <string name="nav_pro_title">Go Pro</string>
-    <string name="nav_pro_summary">Remove Ads!</string>
+    <string name="nav_pro_summary">Buy me a beer!</string>
     <string name="nav_leaderboards">Leaderboards!</string>
     <string name="nav_achievements">Achievements</string>
     <string name="toast_signin_failed">Failed to Sign In :(</string>

@@ -187,13 +187,13 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	public View onCreateView( final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState )
 	{
 		final View view;
-		if( m_isPro )
+		if( !displayAds() )
 		{
-			view = inflater.inflate( R.layout.post_pro_fragment, container, false );
+			view = inflater.inflate( R.layout.post_fragment, container, false );
 		}
 		else
 		{
-			view = inflater.inflate( R.layout.post_fragment, container, false );
+			view = inflater.inflate( R.layout.post_ad_fragment, container, false );
 		}
 
 		Uri uri = Uri.parse( m_post.url );
@@ -377,6 +377,32 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 	{
 		View decorView = window.getDecorView();
 		decorView.setSystemUiVisibility( 0 );
+	}
+
+	private boolean displayAds()
+	{
+		final boolean shouldDisplay;
+
+		if( !m_isPro )
+		{
+			Activity activity = getActivity();
+			if( activity != null )
+			{
+				SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( activity );
+				shouldDisplay = settings.getBoolean( Preferences.KEY_DISPLAY_ADS, false );
+
+			}
+			else
+			{
+				shouldDisplay = false;
+			}
+		}
+		else
+		{
+			shouldDisplay = false;
+		}
+
+		return shouldDisplay;
 	}
 
 	private void showSystemUI()

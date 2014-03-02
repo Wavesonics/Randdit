@@ -2,16 +2,19 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:divider="@drawable/fading_edge_vertical"
-    android:showDividers="middle">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/POST_post_info_container"
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/POST_ad_view"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_width="match_parent"/>
+        android:background="@drawable/ad_background_repeat"
+        app:adSize="SMART_BANNER"
+        app:adUnitId="@string/admob_post_banner_unit_id"/>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -22,17 +25,30 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:clipToPadding="false"
+            android:paddingTop="@dimen/post_bar"
             android:paddingBottom="@dimen/post_bar"
             android:id="@+id/POST_imageview"/>
 
+        <TextView
+            android:id="@+id/POST_title"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/post_bar"
+            android:drawableLeft="@drawable/ic_action_info"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            tools:text="Large Text"
+            android:lines="2"
+            android:ellipsize="end"
+            android:layout_gravity="center_horizontal|top"/>
+
         <FrameLayout
             android:id="@+id/POST_tool_bar"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="@dimen/post_bar"
             android:layout_gravity="bottom"
-            android:background="@color/primary"
-            android:padding="@dimen/button_container_padding">
+            android:gravity="center"
+            android:background="@color/primary">
 
             <Button
                 android:layout_width="wrap_content"
