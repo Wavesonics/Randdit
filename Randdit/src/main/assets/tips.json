@@ -12,8 +12,8 @@
             "id" : "pro_1",
             "type" : "pro",
             "image_threshold" : 10,
-            "title" : "Remove Ads",
-            "body" : "If you go Pro, you can get rid of the Ads and have more room for images!"
+            "title" : "Set Wallpapers",
+            "body" : "Randdit Pro allows you to set images as your wallpaper from right inside the app! Works awesome in the Beautiful category."
         },
         {
             "id" : "change_categories",
@@ -54,8 +54,8 @@
             "id" : "pro_2",
             "type" : "pro",
             "image_threshold" : 500,
-            "title" : "Set Wallpapers",
-            "body" : "Randdit Pro allows you to set images as your wallpaper from right inside the app! Works awesome in the Beautiful category."
+            "title" : "Support Your Dev",
+            "body" : "If you go Pro, I can buy more beer! Or as I like to call it: programming fuel."
         },
         {
             "id" : "1000_images",
