@@ -18,12 +18,11 @@ repositories {
 dependencies {
     compile 'com.android.support:appcompat-v7:+'
     compile 'com.android.support:support-v13:+'
-    compile 'com.google.android.gms:play-services:4.1.32'
+    compile 'com.google.android.gms:play-services:4.2.+'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.github.chrisbanes.photoview:library:1.2.2'
     compile 'de.keyboardsurfer.android.widget:crouton:1.8.2'
-
-    compile 'pl.droidsonroids.gif:android-gif-drawable:1.0.5@aar'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.0.6@aar'
 
     compile files('libs/volley.jar')
     compile files('libs/libGoogleAnalyticsServices.jar')
@@ -31,7 +30,7 @@ dependencies {
 
 android {
     compileSdkVersion 19
-    buildToolsVersion '19.0.1'
+    buildToolsVersion '19.0.2'
 
     defaultConfig {
         minSdkVersion 14
