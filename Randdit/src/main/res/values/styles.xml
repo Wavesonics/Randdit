@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/RandditActionBar</item>
         <item name="android:buttonStyle">@style/RandditButton</item>
         <item name="android:dialogTheme">@style/RandditDialog</item>

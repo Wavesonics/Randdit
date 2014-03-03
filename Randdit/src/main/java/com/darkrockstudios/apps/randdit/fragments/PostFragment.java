@@ -13,6 +13,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,7 +26,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
-import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.darkrockstudios.apps.randdit.DownloadService;
@@ -264,7 +265,8 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 		MenuItem item = menu.findItem( R.id.menu_item_share );
 
 		// Fetch and store ShareActionProvider
-		m_shareActionProvider = (ShareActionProvider) item.getActionProvider();
+		m_shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider( item );
+		;
 
 		Intent shareIntent = createShareIntent( m_post );
 		if( shareIntent != null )

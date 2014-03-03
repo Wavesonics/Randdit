@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,6 +25,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -46,13 +48,22 @@ import com.darkrockstudios.apps.randdit.misc.PurchaseScreenProvider;
 import com.darkrockstudios.apps.randdit.misc.StatCounter;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
+import com.google.android.gms.cast.ApplicationMetadata;
+import com.google.android.gms.cast.CastDevice;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.games.GamesClient;
 import com.google.gson.Gson;
+import com.google.sample.castcompanionlibrary.cast.BaseCastManager;
+import com.google.sample.castcompanionlibrary.cast.DataCastManager;
+import com.google.sample.castcompanionlibrary.cast.callbacks.DataCastConsumerImpl;
+import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
+import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -67,6 +78,8 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	private static final String PURCHASE_FRAGMENT_TAG = "PurchaseFragment";
 	private static final String ABOUT_FRAGMENT_TAG    = "AboutFragment";
 
+	private static final String GOOGLE_CAST_DATA_NAMESPACE = "urn:x-cast:com.darkrockstudios.apps.randdit";
+
 	private static final String SAVE_POSTS    = MainActivity.class.getName() + ".POSTS";
 	private static final String SAVE_NAV_ITEM = MainActivity.class.getName() + ".NAV_ITEM";
 
@@ -77,6 +90,9 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 
 	private NfcAdapter  m_nfcAdapter;
 	private AlertDialog m_wifiAlert;
+
+	private static DataCastManager  m_castManager;
+	private        DataCastConsumer m_dataConsumer;
 
 	private NavDrawerAdapter.NavItem m_currentCategory;
 
@@ -109,6 +125,8 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		PreferenceManager.setDefaultValues( this, R.xml.settings_pro, false );
 
 		initNfc();
+
+		initGoogleCast();
 
 		m_posts = new LinkedList<>();
 
@@ -156,7 +174,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		}
 	}
 
-	private void requestCategories( boolean showPostOnUpdate )
+	private void requestCategories( final boolean showPostOnUpdate )
 	{
 		setProgressBarIndeterminateVisibility( true );
 		setNextImageButtonEnabled( false );
@@ -215,6 +233,8 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	{
 		getMenuInflater().inflate( R.menu.main, menu );
 
+		getDataCastManager( this ).addMediaRouterButton( menu, R.id.media_route_menu_item );
+
 		return true;
 	}
 
@@ -271,11 +291,11 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	@Override
 	public void onStop()
 	{
+		super.onStop();
+
 		EasyTracker.getInstance( this ).activityStop( this );
 
 		submitScores();
-
-		super.onStop();
 	}
 
 	@Override
@@ -304,6 +324,8 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		}
 
 		beginUserInitiatedSignIn();
+
+		getDataCastManager( this );
 	}
 
 	@Override
@@ -421,6 +443,8 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 				{
 					FragmentManager fragmentManager = getFragmentManager();
 
+					sendCastUpdate( post );
+
 					PostFragment fragment = PostFragment.newInstance( post, isPro(), m_currentCategory );
 					fragmentManager.beginTransaction().replace( R.id.content_frame, fragment, CONTENT_FRAGMENT_TAG ).commit();
 
@@ -433,6 +457,24 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			else
 			{
 				requestPosts();
+			}
+		}
+	}
+
+	private void sendCastUpdate( final Post post )
+	{
+		DataCastManager dataCastManager = getDataCastManager( this );
+		if( dataCastManager.isConnected() )
+		{
+			try
+			{
+				Gson gson = new Gson();
+				String message = gson.toJson( post );
+				dataCastManager.sendDataMessage( message, GOOGLE_CAST_DATA_NAMESPACE );
+			}
+			catch( IOException | TransientNetworkDisconnectionException | NoConnectionException e )
+			{
+				e.printStackTrace();
 			}
 		}
 	}
@@ -534,6 +576,23 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		getActionBar().setTitle( newTitle );
 	}
 
+	public static DataCastManager getDataCastManager( final Context ctx )
+	{
+		if( m_castManager == null )
+		{
+			m_castManager = DataCastManager.initialize( ctx,
+			                                            ctx.getString( R.string.google_cast_app_id ),
+			                                            GOOGLE_CAST_DATA_NAMESPACE );
+			m_castManager.enableFeatures( DataCastManager.FEATURE_NOTIFICATION |
+			                              DataCastManager.FEATURE_LOCKSCREEN |
+			                              DataCastManager.FEATURE_DEBUGGING );
+		}
+
+		m_castManager.setContext( ctx );
+
+		return m_castManager;
+	}
+
 	private void initNfc()
 	{
 		m_nfcAdapter = NfcAdapter.getDefaultAdapter( this );
@@ -541,6 +600,16 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		{
 			Log.i( TAG, "NFC not available. Android Beam functionality disabled." );
 		}
+	}
+
+	private void initGoogleCast()
+	{
+		BaseCastManager.checkGooglePlaySevices( this );
+
+		m_dataConsumer = new DataCastConsumer();
+		DataCastManager dataCastManager = getDataCastManager( this );
+		dataCastManager.addDataCastConsumer( m_dataConsumer );
+		dataCastManager.reconnectSessionIfPossible( this, true );
 	}
 
 	private void updateNfcMessage( final Post post )
@@ -815,6 +884,35 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			{
 				showPost();
 			}
+		}
+	}
+
+	private final class DataCastConsumer extends DataCastConsumerImpl
+	{
+		@Override
+		public void onMessageReceived( final CastDevice castDevice,
+		                               final String namespace,
+		                               final String message )
+		{
+			Toast.makeText( MainActivity.this, "Cast msg received", Toast.LENGTH_LONG ).show();
+		}
+
+		@Override
+		public void onMessageSendFailed( final Status status )
+		{
+			Toast.makeText( MainActivity.this, "Cast msg failed: " + status.getStatusCode(), Toast.LENGTH_LONG ).show();
+		}
+
+		@Override
+		public void onApplicationDisconnected( final int errorCode )
+		{
+			Toast.makeText( MainActivity.this, "Device dissconnected " + errorCode, Toast.LENGTH_LONG ).show();
+		}
+
+		@Override
+		public void onApplicationConnected( final ApplicationMetadata appMetadata, final String applicationStatus, final String sessionId, final boolean wasLaunched )
+		{
+
 		}
 	}
 }
