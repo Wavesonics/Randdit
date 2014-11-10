@@ -243,7 +243,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 			if( IS_API_17_OR_LATER )
 			{
 				getChildFragmentManager().beginTransaction().replace( R.id.POST_post_info_container, postInfoFragment )
-						.commit();
+				                         .commit();
 			}
 			else
 			{

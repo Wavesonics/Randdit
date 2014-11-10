@@ -15,6 +15,7 @@ import com.darkrockstudios.util.IabHelper;
 import com.darkrockstudios.util.IabResult;
 import com.darkrockstudios.util.Inventory;
 import com.darkrockstudios.util.Purchase;
+import com.darkrockstudios.util.Security;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -138,13 +139,10 @@ public abstract class BillingActivity extends BaseGameActivity implements Purcha
 
 			if( inventory.hasPurchase( PRODUCT_SKU_PRO ) )
 			{
-				Purchase purchase = inventory.getPurchase( PRODUCT_SKU_PRO );
-				if( verifyPurchase( purchase.getDeveloperPayload(), purchase.getSignature() ) )
-				{
-					Log.d( TAG, "Holy crap we're pro!" );
-					cacheProLocally();
-					m_isPro = true;
-				}
+				Log.d( TAG, "Holy crap we're pro!" );
+				//Purchase purchase = inventory.getPurchase( PRODUCT_SKU_PRO );
+				cacheProLocally();
+				m_isPro = true;
 			}
 
 			if( !m_isPro )
@@ -185,7 +183,7 @@ public abstract class BillingActivity extends BaseGameActivity implements Purcha
 					String devPayload = jo.getString( "developerPayload" );
 
 					if( PRODUCT_SKU_PRO.equals( sku ) &&
-					    verifyPurchase( purchaseData, dataSignature ) &&
+					    Security.verifyPurchase( assemblePublicKey(), purchaseData, dataSignature ) &&
 					    m_devPayload.equals( devPayload ) )
 					{
 						Log.d( TAG, "You have bought " + sku );
@@ -226,10 +224,5 @@ public abstract class BillingActivity extends BaseGameActivity implements Purcha
 		       BillingSecurity.superSecureCrypto( MEENY ) +
 		       BillingSecurity.superSecureCrypto( getString( R.string.miny ) ) +
 		       BillingSecurity.superSecureCrypto( getString( R.string.moe ) );
-	}
-
-	private boolean verifyPurchase( final String data, final String signature )
-	{
-		return BillingSecurity.verifySignature( assemblePublicKey(), data, signature );
 	}
 }

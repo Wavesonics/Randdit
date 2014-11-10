@@ -315,9 +315,12 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			presentDataWarning();
 		}
 
-		beginUserInitiatedSignIn();
+		if( BuildConfig.DEBUG )
+		{
+			getDataCastManager( this );
+		}
 
-		getDataCastManager( this );
+		beginUserInitiatedSignIn();
 	}
 
 	@Override
