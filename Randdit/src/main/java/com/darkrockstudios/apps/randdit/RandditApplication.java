@@ -8,6 +8,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.darkrockstudios.views.uriimageview.LruDrawableCache;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
 
 /**
  * Created by Adam on 11/11/13.
@@ -16,6 +18,7 @@ public class RandditApplication extends Application
 {
 	private static RequestQueue     s_requestQueue;
 	private static LruDrawableCache s_imageCache;
+	private static Tracker s_tracker;
 
 	public void onCreate()
 	{
@@ -24,6 +27,21 @@ public class RandditApplication extends Application
 		s_requestQueue = Volley.newRequestQueue( this );
 		LruImageCache imageCache = new LruImageCache();
 		s_imageCache = new LruDrawableCache();
+
+		GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+		analytics.enableAutoActivityReports( this );
+		s_tracker = analytics.newTracker( R.xml.analytics );
+
+		// Don't report starts during testing
+		if( BuildConfig.DEBUG )
+		{
+			analytics.setDryRun( true );
+		}
+	}
+
+	public static Tracker getAnalyticsTracker()
+	{
+		return s_tracker;
 	}
 
 	public static RequestQueue getRequestQueue()

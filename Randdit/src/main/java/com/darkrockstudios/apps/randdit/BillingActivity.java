@@ -1,34 +1,30 @@
 package com.darkrockstudios.apps.randdit;
 
-import android.app.PendingIntent;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.android.vending.billing.IInAppBillingService;
 import com.darkrockstudios.apps.randdit.billing.BillingSecurity;
 import com.darkrockstudios.apps.randdit.googleplaygames.BaseGameActivity;
 import com.darkrockstudios.apps.randdit.misc.Preferences;
 import com.darkrockstudios.apps.randdit.misc.PurchaseProvider;
+import com.darkrockstudios.util.IabException;
+import com.darkrockstudios.util.IabHelper;
+import com.darkrockstudios.util.IabResult;
+import com.darkrockstudios.util.Inventory;
+import com.darkrockstudios.util.Purchase;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 /**
  * Created by Adam on 12/10/13.
  */
-public abstract class BillingActivity extends BaseGameActivity implements PurchaseProvider
+public abstract class BillingActivity extends BaseGameActivity implements PurchaseProvider, IabHelper.OnIabPurchaseFinishedListener
 {
 	private static final String TAG             = BillingActivity.class.getSimpleName();
 	private static final String PRODUCT_SKU_PRO = "randdit_pro";
@@ -39,41 +35,23 @@ public abstract class BillingActivity extends BaseGameActivity implements Purcha
 	private static final String MEENY =
 			"xu1i3A7Vun/fvV77glWfrimcffdiHUxN24qWM6gRr+yTp2o6nTEcxQAwDrYMfo93525YOQU7eSuubV+gpdwsM2Q8qViF273jsJ";
 
-	private boolean m_isPro;
+	private IabHelper m_billingHelper;
 
-	private IInAppBillingService     m_service;
-	private BillingServiceConnection m_serviceConn;
+	private boolean m_isPro;
 
 	private ProStatusListener m_statusListener;
 
 	private String m_devPayload;
 
+	@Override
+	public void onIabPurchaseFinished( IabResult result, Purchase info )
+	{
+
+	}
+
 	public static interface ProStatusListener
 	{
 		public void onProStatusUpdate( final boolean isPro );
-	}
-
-	private class BillingServiceConnection implements ServiceConnection
-	{
-		@Override
-		public void onServiceDisconnected( final ComponentName name )
-		{
-			m_service = null;
-		}
-
-		@Override
-		public void onServiceConnected( final ComponentName name,
-		                                final IBinder service )
-		{
-			m_service = IInAppBillingService.Stub.asInterface( service );
-
-			Log.d( TAG, "Billing service connected." );
-
-			if( !m_isPro )
-			{
-				runProCheck();
-			}
-		}
 	}
 
 	public void setProStatusListener( final ProStatusListener listener )
@@ -89,24 +67,41 @@ public abstract class BillingActivity extends BaseGameActivity implements Purcha
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( this );
 		m_isPro = settings.getBoolean( Preferences.KEY_IS_PRO, false );
 
-		m_serviceConn = new BillingServiceConnection();
+		m_billingHelper = new IabHelper( this, assemblePublicKey() );
+
 		connectToService();
 	}
 
 	private void connectToService()
 	{
-		bindService( new Intent( "com.android.vending.billing.InAppBillingService.BIND" ),
-		             m_serviceConn, Context.BIND_AUTO_CREATE );
+		m_billingHelper.startSetup( new IabHelper.OnIabSetupFinishedListener()
+		{
+			public void onIabSetupFinished( IabResult result )
+			{
+				if( !result.isSuccess() )
+				{
+					// Oh noes, there was a problem.
+					Log.d( TAG, "Problem setting up In-app Billing: " + result );
+				}
+				else
+				{
+					Log.d( TAG, "Billing service connected." );
+
+					if( !m_isPro )
+					{
+						runProCheck();
+					}
+				}
+			}
+		} );
 	}
 
 	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
-		if( m_serviceConn != null )
-		{
-			unbindService( m_serviceConn );
-		}
+		if ( m_billingHelper != null) m_billingHelper.dispose();
+		m_billingHelper = null;
 	}
 
 	public boolean isPro()
@@ -137,85 +132,37 @@ public abstract class BillingActivity extends BaseGameActivity implements Purcha
 	private void checkForPro()
 	{
 		Log.d( TAG, "Checking pro purchase status..." );
-
-		if( m_service != null )
+		try
 		{
-			try
+			Inventory inventory = m_billingHelper.queryInventory( false, null, null );
+
+			if( inventory.hasPurchase( PRODUCT_SKU_PRO ) )
 			{
-				Log.d( TAG, "sending request..." );
-				Bundle ownedItems = m_service.getPurchases( 3, getPackageName(), "inapp", null );
-				Log.d( TAG, "Request received!" );
-				int response = ownedItems.getInt( "RESPONSE_CODE" );
-				if( response == 0 )
+				Purchase purchase = inventory.getPurchase( PRODUCT_SKU_PRO );
+				if( verifyPurchase( purchase.getDeveloperPayload(), purchase.getSignature() ) )
 				{
-					ArrayList<String> ownedSkus = ownedItems.getStringArrayList( "INAPP_PURCHASE_ITEM_LIST" );
-					ArrayList<String> purchaseDataList = ownedItems.getStringArrayList( "INAPP_PURCHASE_DATA_LIST" );
-					ArrayList<String> signatureList = ownedItems.getStringArrayList( "INAPP_DATA_SIGNATURE_LIST" );
-					//String continuationToken = ownedItems.getString( "INAPP_CONTINUATION_TOKEN" );
-
-					for( int ii = 0; ii < purchaseDataList.size(); ++ii )
-					{
-						String purchaseData = purchaseDataList.get( ii );
-						String dataSignature = signatureList.get( ii );
-						String sku = ownedSkus.get( ii );
-
-						if( sku.equals( PRODUCT_SKU_PRO ) && verifyPurchase( purchaseData, dataSignature ) )
-						{
-							Log.d( TAG, "Holy crap we're pro!" );
-							cacheProLocally();
-							m_isPro = true;
-
-							/*
-							// Consume the purchase for dev reset purposes
-							JSONObject jo = new JSONObject( purchaseData );
-							String token = jo.getString( "purchaseToken" );
-							int consumeResponse = m_service.consumePurchase( 3, getPackageName(), token );
-							Log.d( TAG, "Purchase consumed!");
-							*/
-						}
-					}
-				}
-
-				if( !m_isPro )
-				{
-					Log.d( TAG, "I don't think we're pro :(" );
+					Log.d( TAG, "Holy crap we're pro!" );
+					cacheProLocally();
+					m_isPro = true;
 				}
 			}
-			catch( RemoteException e )
+
+			if( !m_isPro )
 			{
-				e.printStackTrace();
+				Log.d( TAG, "I don't think we're pro :(" );
 			}
+		}
+		catch( IabException e )
+		{
+			e.printStackTrace();
 		}
 	}
 
 	@Override
 	public void purchasePro()
 	{
-		if( m_service != null )
-		{
-			try
-			{
-				m_devPayload = generateNewDevPayload();
-				Bundle buyIntentBundle =
-						m_service.getBuyIntent( 3, getPackageName(), PRODUCT_SKU_PRO, "inapp", m_devPayload );
-
-				int responseCode = buyIntentBundle.getInt( "RESPONSE_CODE", 0 );
-				if( responseCode == 0 )
-				{
-					PendingIntent pendingIntent = buyIntentBundle.getParcelable( "BUY_INTENT" );
-
-					startIntentSenderForResult( pendingIntent.getIntentSender(),
-					                            1001, new Intent(),
-					                            Integer.valueOf( 0 ),
-					                            Integer.valueOf( 0 ),
-					                            Integer.valueOf( 0 ) );
-				}
-			}
-			catch( RemoteException | IntentSender.SendIntentException e )
-			{
-				e.printStackTrace();
-			}
-		}
+		m_devPayload = generateNewDevPayload();
+		m_billingHelper.launchPurchaseFlow( this, PRODUCT_SKU_PRO, 3, this, m_devPayload );
 	}
 
 	@Override

@@ -105,7 +105,7 @@ public class AboutFragment extends DialogFragment implements View.OnClickListene
 	{
 		if( v.getId() == R.id.ABOUT_market_button && isAdded() )
 		{
-			Analytics.trackViewOtherAppsClick( getActivity() );
+			Analytics.trackViewOtherAppsClick();
 
 			Intent intent = new Intent( Intent.ACTION_VIEW );
 			intent.setData( Uri.parse( "market://search?q=pub:Dark+Rock+Studios" ) );

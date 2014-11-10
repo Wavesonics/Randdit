@@ -119,7 +119,7 @@ public class TipFragment extends DialogFragment implements View.OnClickListener
 	{
 		if( v.getId() == R.id.TIP_pro_button )
 		{
-			Analytics.trackProClick( getActivity(), m_tip.id );
+			Analytics.trackProClick( m_tip.id );
 
 			if( m_purchaseScreenProvider != null )
 			{
@@ -128,7 +128,7 @@ public class TipFragment extends DialogFragment implements View.OnClickListener
 		}
 		else if( v.getId() == R.id.TIP_rate_button )
 		{
-			Analytics.trackRateClick( getActivity(), m_tip.id );
+			Analytics.trackRateClick( m_tip.id );
 
 			Intent intent = new Intent( Intent.ACTION_VIEW );
 			intent.setData( Uri.parse( "market://details?id=com.darkrockstudios.apps.randdit" ) );

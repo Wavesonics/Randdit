@@ -1,180 +1,142 @@
 package com.darkrockstudios.apps.randdit.misc;
 
-import android.content.Context;
+import com.darkrockstudios.apps.randdit.RandditApplication;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.Fields;
-import com.google.analytics.tracking.android.MapBuilder;
 
 /**
  * Created by Adam on 11/24/13.
  */
 public final class Analytics
 {
-	public static void trackScreen( final Context context, final String screenName, final boolean pro )
+	public static final int DIMENSION_CATEGORY_NAME = 1;
+	public static final int DIMENSION_PRO           = 2;
+	public static final int DIMENSION_ORIGIN        = 3;
+
+	public static void trackNextImageClick( final NavDrawerAdapter.NavItem category, final boolean pro )
 	{
-		EasyTracker easyTracker = EasyTracker.getInstance( context );
-		easyTracker.set( Fields.SCREEN_NAME, screenName );
-		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
-		easyTracker.send( MapBuilder.createAppView().build() );
+		Tracker tracker = RandditApplication.getAnalyticsTracker();
+		tracker.send( new HitBuilders.EventBuilder()
+				              .setCustomDimension( DIMENSION_CATEGORY_NAME, NavDrawerAdapter.getId( category ) )
+				              .setCustomDimension( DIMENSION_PRO, pro + "" )
+				              .setCategory( "ui_action" )
+				              .setLabel( "Get next image" )
+				              .setAction( "get_next_image" )
+				              .build() );
 	}
 
-	public static void trackNextImageClick( final Context context, final NavDrawerAdapter.NavItem category, final boolean pro )
+	public static void trackCategoryChange( final NavDrawerAdapter.NavItem category, final boolean pro )
 	{
-		EasyTracker easyTracker = EasyTracker.getInstance( context );
-
-		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
-		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
-		easyTracker.send( MapBuilder
-				                  .createEvent( "ui_action",     // Event category (required)
-				                                "get_next_image",  // Event action (required)
-				                                "Get next image",   // Event label
-				                                null )            // Event value
-				                  .build()
-		);
+		Tracker tracker = RandditApplication.getAnalyticsTracker();
+		tracker.send( new HitBuilders.EventBuilder()
+				              .setCustomDimension( DIMENSION_CATEGORY_NAME, NavDrawerAdapter.getId( category ) )
+				              .setCustomDimension( DIMENSION_PRO, pro + "" )
+				              .setCategory( "ui_action" )
+				              .setAction( "category_selected" )
+				              .setLabel( "Category changed" )
+				              .build() );
 	}
 
-	public static void trackCategoryChange( final Context context, final NavDrawerAdapter.NavItem category, final boolean pro )
+	public static void trackDownload( final NavDrawerAdapter.NavItem category, final boolean pro )
 	{
-		EasyTracker easyTracker = EasyTracker.getInstance( context );
-
-		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
-		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
-		easyTracker.send( MapBuilder
-				                  .createEvent( "ui_action",     // Event category (required)
-				                                "category_selected",  // Event action (required)
-				                                "Category changed",   // Event label
-				                                null )            // Event value
-				                  .build()
-		);
+		Tracker tracker = RandditApplication.getAnalyticsTracker();
+		tracker.send( new HitBuilders.EventBuilder()
+				              .setCustomDimension( DIMENSION_CATEGORY_NAME, NavDrawerAdapter.getId( category ) )
+				              .setCustomDimension( DIMENSION_PRO, pro + "" )
+				              .setCategory( "ui_action" )
+				              .setAction( "download_button" )
+				              .setLabel( "Image downloaded" )
+				              .build() );
 	}
 
-	public static void trackDownload( final Context context, final NavDrawerAdapter.NavItem category, final boolean pro )
+	public static void trackWallpaper( final NavDrawerAdapter.NavItem category, final boolean pro )
 	{
-		EasyTracker easyTracker = EasyTracker.getInstance( context );
-
-		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
-		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
-		easyTracker.send( MapBuilder
-				                  .createEvent( "ui_action",     // Event category (required)
-				                                "download_button",  // Event action (required)
-				                                "Image downloaded",   // Event label
-				                                null )            // Event value
-				                  .build()
-		);
+		Tracker tracker = RandditApplication.getAnalyticsTracker();
+		tracker.send( new HitBuilders.EventBuilder()
+				              .setCustomDimension( DIMENSION_CATEGORY_NAME, NavDrawerAdapter.getId( category ) )
+				              .setCustomDimension( DIMENSION_PRO, pro + "" )
+				              .setCategory( "ui_action" )
+				              .setAction( "wallpaper_button" )
+				              .setLabel( "Wallpaper set" )
+				              .build() );
 	}
 
-	public static void trackWallpaper( final Context context, final NavDrawerAdapter.NavItem category, final boolean pro )
+	public static void trackSettings( final boolean pro )
 	{
-		EasyTracker easyTracker = EasyTracker.getInstance( context );
-
-		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
-		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
-		easyTracker.send( MapBuilder
-				                  .createEvent( "ui_action",     // Event category (required)
-				                                "wallpaper_button",  // Event action (required)
-				                                "Wallpaper set",   // Event label
-				                                null )            // Event value
-				                  .build()
-		);
+		Tracker tracker = RandditApplication.getAnalyticsTracker();
+		tracker.send( new HitBuilders.EventBuilder()
+				              .setCustomDimension( DIMENSION_PRO, pro + "" )
+				              .setCategory( "ui_action" )
+				              .setAction( "settings_button" )
+				              .setLabel( "Settings" )
+				              .build() );
 	}
 
-	public static void trackSettings( final Context context, final boolean pro )
+	public static void trackShare( final NavDrawerAdapter.NavItem category, final boolean pro )
 	{
-		EasyTracker easyTracker = EasyTracker.getInstance( context );
-
-		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
-		easyTracker.send( MapBuilder
-				                  .createEvent( "ui_action",     // Event category (required)
-				                                "settings_button",  // Event action (required)
-				                                "Settings",   // Event label
-				                                null )            // Event value
-				                  .build()
-		);
+		Tracker tracker = RandditApplication.getAnalyticsTracker();
+		tracker.send( new HitBuilders.EventBuilder()
+				              .setCustomDimension( DIMENSION_CATEGORY_NAME, NavDrawerAdapter.getId( category ) )
+				              .setCustomDimension( DIMENSION_PRO, pro + "" )
+				              .setCategory( "ui_action" )
+				              .setAction( "share_button" )
+				              .setLabel( "Post shared" )
+				              .build() );
 	}
 
-	public static void trackShare( final Context context, final NavDrawerAdapter.NavItem category, final boolean pro )
+	public static void trackFullscreen( final NavDrawerAdapter.NavItem category, final boolean pro )
 	{
-		EasyTracker easyTracker = EasyTracker.getInstance( context );
-
-		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
-		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
-		easyTracker.send( MapBuilder
-				                  .createEvent( "ui_action",     // Event category (required)
-				                                "share_button",  // Event action (required)
-				                                "Post shared",   // Event label
-				                                null )            // Event value
-				                  .build()
-		);
+		Tracker tracker = RandditApplication.getAnalyticsTracker();
+		tracker.send( new HitBuilders.EventBuilder()
+				              .setCustomDimension( DIMENSION_CATEGORY_NAME, NavDrawerAdapter.getId( category ) )
+				              .setCustomDimension( DIMENSION_PRO, pro + "" )
+				              .setCategory( "ui_action" )
+				              .setAction( "toggle_fullscreen" )
+				              .setLabel( "Toggle Fullscreen" )
+				              .build() );
 	}
 
-	public static void trackFullscreen( final Context context, final NavDrawerAdapter.NavItem category, final boolean pro )
+	public static void trackProClick( final String origin )
 	{
-		EasyTracker easyTracker = EasyTracker.getInstance( context );
-
-		easyTracker.set( Fields.customDimension( 2 ), pro + "" );
-		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
-		easyTracker.send( MapBuilder
-				                  .createEvent( "ui_action",     // Event category (required)
-				                                "toggle_fullscreen",  // Event action (required)
-				                                "Toggle Fullscreen",   // Event label
-				                                null )            // Event value
-				                  .build()
-		);
+		Tracker tracker = RandditApplication.getAnalyticsTracker();
+		tracker.send( new HitBuilders.EventBuilder()
+				              .setCustomDimension( DIMENSION_ORIGIN, origin )
+				              .setCategory( "ui_action" )
+				              .setAction( "purchase_pro" )
+				              .setLabel( "Pro dialog presented" )
+				              .build() );
 	}
 
-	public static void trackProClick( final Context context, final String origin )
+	public static void trackRateClick( final String origin )
 	{
-		EasyTracker easyTracker = EasyTracker.getInstance( context );
-
-		easyTracker.set( Fields.customDimension( 3 ), origin );
-		easyTracker.send( MapBuilder
-				                  .createEvent( "ui_action",     // Event category (required)
-				                                "purchase_pro",  // Event action (required)
-				                                "Pro dialog presented",   // Event label
-				                                null )            // Event value
-				                  .build()
-		);
+		Tracker tracker = RandditApplication.getAnalyticsTracker();
+		tracker.send( new HitBuilders.EventBuilder()
+				              .setCustomDimension( DIMENSION_ORIGIN, origin )
+				              .setCategory( "ui_action" )
+				              .setAction( "rate_app" )
+				              .setLabel( "Google Play launched to rate the app" )
+				              .build() );
 	}
 
-	public static void trackRateClick( final Context context, final String origin )
+	public static void trackAboutClick( final NavDrawerAdapter.NavItem category )
 	{
-		EasyTracker easyTracker = EasyTracker.getInstance( context );
-
-		easyTracker.set( Fields.customDimension( 3 ), origin );
-		easyTracker.send( MapBuilder
-				                  .createEvent( "ui_action",     // Event category (required)
-				                                "rate_app",  // Event action (required)
-				                                "Google Play launched to rate the app",   // Event label
-				                                null )            // Event value
-				                  .build()
-		);
+		Tracker tracker = RandditApplication.getAnalyticsTracker();
+		tracker.send( new HitBuilders.EventBuilder()
+				              .setCustomDimension( DIMENSION_CATEGORY_NAME, NavDrawerAdapter.getId( category ) )
+				              .setCategory( "ui_action" )
+				              .setAction( "about" )
+				              .setLabel( "About displayed" )
+				              .build() );
 	}
 
-	public static void trackAboutClick( final Context context, final NavDrawerAdapter.NavItem category )
+	public static void trackViewOtherAppsClick()
 	{
-		EasyTracker easyTracker = EasyTracker.getInstance( context );
-
-		easyTracker.set( Fields.customDimension( 1 ), NavDrawerAdapter.getId( category ) );
-		easyTracker.send( MapBuilder
-				                  .createEvent( "ui_action",     // Event category (required)
-				                                "about",  // Event action (required)
-				                                "About displayed",   // Event label
-				                                null )            // Event value
-				                  .build()
-		);
-	}
-
-	public static void trackViewOtherAppsClick( final Context context )
-	{
-		EasyTracker easyTracker = EasyTracker.getInstance( context );
-
-		easyTracker.send( MapBuilder
-				                  .createEvent( "ui_action",     // Event category (required)
-				                                "view_other_apps",  // Event action (required)
-				                                "View other Dark Rock Studios apps in Play Store",   // Event label
-				                                null )            // Event value
-				                  .build()
-		);
+		Tracker tracker = RandditApplication.getAnalyticsTracker();
+		tracker.send( new HitBuilders.EventBuilder()
+				              .setCategory( "ui_action" )
+				              .setAction( "view_other_apps" )
+				              .setLabel( "View other Dark Rock Studios apps in Play Store" )
+				              .build() );
 	}
 }

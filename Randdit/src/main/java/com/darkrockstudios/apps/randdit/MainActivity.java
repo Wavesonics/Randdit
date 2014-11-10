@@ -42,16 +42,15 @@ import com.darkrockstudios.apps.randdit.misc.CategoryDefinition;
 import com.darkrockstudios.apps.randdit.misc.CategoryUtility;
 import com.darkrockstudios.apps.randdit.misc.NavDrawerAdapter;
 import com.darkrockstudios.apps.randdit.misc.NextButtonEnabler;
+import com.darkrockstudios.apps.randdit.misc.OsUtils;
 import com.darkrockstudios.apps.randdit.misc.Post;
 import com.darkrockstudios.apps.randdit.misc.Preferences;
 import com.darkrockstudios.apps.randdit.misc.PurchaseScreenProvider;
 import com.darkrockstudios.apps.randdit.misc.StatCounter;
-import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.android.gms.cast.ApplicationMetadata;
 import com.google.android.gms.cast.CastDevice;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.games.GamesClient;
+import com.google.android.gms.games.Games;
 import com.google.gson.Gson;
 import com.google.sample.castcompanionlibrary.cast.BaseCastManager;
 import com.google.sample.castcompanionlibrary.cast.DataCastManager;
@@ -111,27 +110,21 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	@Override
 	protected void onCreate( final Bundle savedInstanceState )
 	{
-		requestWindowFeature( Window.FEATURE_INDETERMINATE_PROGRESS );
+		supportRequestWindowFeature( Window.FEATURE_INDETERMINATE_PROGRESS );
 		setProStatusListener( this );
 
 		super.onCreate( savedInstanceState );
-
-		// Don't report starts during testing
-		if( BuildConfig.DEBUG )
-		{
-			GoogleAnalytics.getInstance( this ).setDryRun( true );
-		}
 
 		PreferenceManager.setDefaultValues( this, R.xml.settings_pro, false );
 
 		initNfc();
 
-		initGoogleCast();
+		if( BuildConfig.DEBUG )
+		{
+			initGoogleCast();
+		}
 
 		m_posts = new LinkedList<>();
-
-		// Bug in API 14 where it is shown by default
-		setProgressBarIndeterminateVisibility( false );
 
 		m_categories = CategoryUtility.getCategories( this );
 		if( m_categories == null )
@@ -143,8 +136,8 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			m_navDrawerAdapter.setCategories( m_categories );
 		}
 
-		m_navDrawerAdapter.setGameHelper( mHelper );
-		m_navDrawerAdapter.setSignedIn( mHelper.isSignedIn() );
+		m_navDrawerAdapter.setGameHelper( m_gameHelper );
+		m_navDrawerAdapter.setSignedIn( m_gameHelper.isSignedIn() );
 
 		final String postId = getPostFromIntent( getIntent() );
 		if( savedInstanceState != null )
@@ -176,7 +169,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 
 	private void requestCategories( final boolean showPostOnUpdate )
 	{
-		setProgressBarIndeterminateVisibility( true );
+		setSupportProgressBarIndeterminateVisibility( true );
 		setNextImageButtonEnabled( false );
 
 		final String url = "http://randdit.com/actions/get_default_categories.php";
@@ -233,7 +226,10 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	{
 		getMenuInflater().inflate( R.menu.main, menu );
 
-		getDataCastManager( this ).addMediaRouterButton( menu, R.id.media_route_menu_item );
+		if( BuildConfig.DEBUG )
+		{
+			getDataCastManager( this ).addMediaRouterButton( menu, R.id.media_route_menu_item );
+		}
 
 		return true;
 	}
@@ -254,18 +250,18 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 				Intent intent = new Intent( this, SettingsActivity.class );
 				startActivity( intent );
 
-				Analytics.trackSettings( this, isPro() );
+				Analytics.trackSettings( isPro() );
 
 				handled = true;
 			}
 			else if( id == R.id.menu_item_share )
 			{
-				Analytics.trackShare( this, m_currentCategory, isPro() );
+				Analytics.trackShare( m_currentCategory, isPro() );
 				handled = super.onOptionsItemSelected( item );
 			}
 			else if( id == R.id.menu_item_about )
 			{
-				Analytics.trackAboutClick( this, m_currentCategory );
+				Analytics.trackAboutClick( m_currentCategory );
 
 				AboutFragment fragment = AboutFragment.newInstance();
 				fragment.show( getFragmentManager(), ABOUT_FRAGMENT_TAG );
@@ -284,16 +280,12 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	public void onStart()
 	{
 		super.onStart();
-
-		EasyTracker.getInstance( this ).activityStart( this );
 	}
 
 	@Override
 	public void onStop()
 	{
 		super.onStop();
-
-		EasyTracker.getInstance( this ).activityStop( this );
 
 		submitScores();
 	}
@@ -342,6 +334,16 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		}
 	}
 
+	@Override
+	public void setSupportProgressBarIndeterminateVisibility( boolean visible )
+	{
+		// TODO: Dirty hack for 5.0 devices for now
+		if( !OsUtils.atLeastL() )
+		{
+			super.setSupportProgressBarIndeterminateVisibility( visible );
+		}
+	}
+
 	private void updateCategory( final NavDrawerAdapter.NavItem category )
 	{
 		m_currentCategory = category;
@@ -352,7 +354,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	{
 		if( m_currentCategory != null )
 		{
-			setProgressBarIndeterminateVisibility( true );
+			setSupportProgressBarIndeterminateVisibility( true );
 			setNextImageButtonEnabled( false );
 
 			final String url = "http://randdit.com/" + NavDrawerAdapter.getId( m_currentCategory ) + "/" + postId + "/?api";
@@ -369,7 +371,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	{
 		if( m_currentCategory != null )
 		{
-			setProgressBarIndeterminateVisibility( true );
+			setSupportProgressBarIndeterminateVisibility( true );
 			setNextImageButtonEnabled( false );
 
 			final String url = "http://randdit.com/" + NavDrawerAdapter.getId( m_currentCategory ) + "/?api";
@@ -410,7 +412,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 				updateCategory( NavDrawerAdapter.CATEGORY_ALL );
 			}
 
-			Analytics.trackNextImageClick( this, m_currentCategory, isPro() );
+			Analytics.trackNextImageClick( m_currentCategory, isPro() );
 			showPost();
 		}
 	}
@@ -487,31 +489,31 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			if( views >= 100 )
 			{
 				Log.i( TAG, "Unlocking 100 Views Achievement" );
-				getGamesClient().unlockAchievement( getString( R.string.achievement_100_views ) );
+				Games.Achievements.unlock( getApiClient(), getString( R.string.achievement_100_views ) );
 			}
 
 			if( views >= 500 )
 			{
 				Log.i( TAG, "Unlocking 500 Views Achievement" );
-				getGamesClient().unlockAchievement( getString( R.string.achievement_500_views ) );
+				Games.Achievements.unlock( getApiClient(), getString( R.string.achievement_500_views ) );
 			}
 
 			if( views >= 1000 )
 			{
 				Log.i( TAG, "Unlocking 1000 Views Achievement" );
-				getGamesClient().unlockAchievement( getString( R.string.achievement_1000_views ) );
+				Games.Achievements.unlock( getApiClient(), getString( R.string.achievement_1000_views ) );
 			}
 
 			if( views >= 2000 )
 			{
 				Log.i( TAG, "Unlocking 2000 Views Achievement" );
-				getGamesClient().unlockAchievement( getString( R.string.achievement_2000_views ) );
+				Games.Achievements.unlock( getApiClient(), getString( R.string.achievement_2000_views ) );
 			}
 
 			if( views >= 5000 )
 			{
 				Log.i( TAG, "Unlocking 5000 Views Achievement" );
-				getGamesClient().unlockAchievement( getString( R.string.achievement_5000_views ) );
+				Games.Achievements.unlock( getApiClient(), getString( R.string.achievement_5000_views ) );
 			}
 		}
 	}
@@ -526,14 +528,14 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			m_posts.clear();
 			requestPosts();
 
-			Analytics.trackCategoryChange( this, m_currentCategory, isPro() );
+			Analytics.trackCategoryChange( m_currentCategory, isPro() );
 		}
 		else
 		{
 			switch( navItem.type )
 			{
 				case ProAd:
-					Analytics.trackProClick( this, "nav_drawer" );
+					Analytics.trackProClick( "nav_drawer" );
 
 					showPurchaseScreen();
 					break;
@@ -541,15 +543,16 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 					m_drawerLayout.closeDrawer( Gravity.LEFT );
 
 					submitScores();
-					startActivityForResult( mHelper.getGamesClient()
-					                               .getLeaderboardIntent( getString( R.string.leaderboard_views ) ),
+
+					startActivityForResult( Games.Leaderboards.getLeaderboardIntent( getApiClient(),
+					                                                                 getString( R.string.leaderboard_views ) ),
 					                        REQUEST_LEADERBOARD );
 
 					break;
 				case Achievements:
 					m_drawerLayout.closeDrawer( Gravity.LEFT );
 
-					startActivityForResult( mHelper.getGamesClient().getAchievementsIntent(), REQUEST_ACHIEVEMENTS );
+					startActivityForResult( Games.Achievements.getAchievementsIntent( getApiClient() ), REQUEST_ACHIEVEMENTS );
 					break;
 			}
 		}
@@ -573,7 +576,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			newTitle = appName;
 		}
 
-		getActionBar().setTitle( newTitle );
+		getSupportActionBar().setTitle( newTitle );
 	}
 
 	public static DataCastManager getDataCastManager( final Context ctx )
@@ -757,8 +760,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			if( allTimeViews > 0 )
 			{
 				Log.d( TAG, "Submitting all time view score: " + allTimeViews );
-				GamesClient gamesClient = getGamesClient();
-				gamesClient.submitScore( getString( R.string.leaderboard_views ), allTimeViews );
+				Games.Leaderboards.submitScore( getApiClient(), getString( R.string.leaderboard_views ), allTimeViews );
 			}
 		}
 	}

@@ -19,34 +19,32 @@ package com.darkrockstudios.apps.randdit.googleplaygames;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 
-import com.google.android.gms.appstate.AppStateClient;
-import com.google.android.gms.games.GamesClient;
-import com.google.android.gms.plus.PlusClient;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 /**
  * Example base class for games. This implementation takes care of setting up
- * the GamesClient object and managing its lifecycle. Subclasses only need to
+ * the API client object and managing its lifecycle. Subclasses only need to
  * override the @link{#onSignInSucceeded} and @link{#onSignInFailed} abstract
  * methods. To initiate the sign-in flow when the user clicks the sign-in
  * button, subclasses should call @link{#beginUserInitiatedSignIn}. By default,
- * this class only instantiates the GamesClient object. If the PlusClient or
+ * this class only instantiates the GoogleApiClient object. If the PlusClient or
  * AppStateClient objects are also wanted, call the BaseGameActivity(int)
  * constructor and specify the requested clients. For example, to request
  * PlusClient and GamesClient, use BaseGameActivity(CLIENT_GAMES | CLIENT_PLUS).
  * To request all available clients, use BaseGameActivity(CLIENT_ALL).
  * Alternatively, you can also specify the requested clients via
- *
- * @author Bruno Oliveira (Google)
  * @link{#setRequestedClients}, but you must do so before @link{#onCreate}
  * gets called, otherwise the call will have no effect.
+ *
+ * @author Bruno Oliveira (Google)
  */
 public abstract class BaseGameActivity extends ActionBarActivity implements
-                                                                 GameHelper.GameHelperListener
-{
+                                                                GameHelper.GameHelperListener {
 
 	// The game helper object. This class is mainly a wrapper around this object.
-	protected GameHelper mHelper;
+	protected GameHelper m_gameHelper;
 
 	// We expose these constants here because we don't want users of this class
 	// to have to know about GameHelper at all.
@@ -58,26 +56,19 @@ public abstract class BaseGameActivity extends ActionBarActivity implements
 	// Requested clients. By default, that's just the games client.
 	protected int mRequestedClients = CLIENT_GAMES;
 
-	// stores any additional scopes.
-	private String[] mAdditionalScopes;
+	private final static String  TAG       = "BaseGameActivity";
+	protected            boolean mDebugLog = false;
 
-	protected String  mDebugTag = "BaseGameActivity";
-	protected boolean mDebugLog = false;
-
-	/**
-	 * Constructs a BaseGameActivity with default client (GamesClient).
-	 */
+	/** Constructs a BaseGameActivity with default client (GamesClient). */
 	protected BaseGameActivity()
 	{
 		super();
-		mHelper = new GameHelper( this );
 	}
 
 	/**
 	 * Constructs a BaseGameActivity with the requested clients.
-	 *
 	 * @param requestedClients The requested clients (a combination of CLIENT_GAMES,
-	 *                         CLIENT_PLUS and CLIENT_APPSTATE).
+	 *         CLIENT_PLUS and CLIENT_APPSTATE).
 	 */
 	protected BaseGameActivity( int requestedClients )
 	{
@@ -88,130 +79,114 @@ public abstract class BaseGameActivity extends ActionBarActivity implements
 	/**
 	 * Sets the requested clients. The preferred way to set the requested clients is
 	 * via the constructor, but this method is available if for some reason your code
-	 * cannot do this in the constructor. This must be called before onCreate in order to
-	 * have any effect. If called after onCreate, this method is a no-op.
+	 * cannot do this in the constructor. This must be called before onCreate or getGameHelper()
+	 * in order to have any effect. If called after onCreate()/getGameHelper(), this method
+	 * is a no-op.
 	 *
-	 * @param requestedClients  A combination of the flags CLIENT_GAMES, CLIENT_PLUS
-	 *                          and CLIENT_APPSTATE, or CLIENT_ALL to request all available clients.
-	 * @param additionalScopes. Scopes that should also be requested when the auth
-	 *                          request is made.
+	 * @param requestedClients A combination of the flags CLIENT_GAMES, CLIENT_PLUS
+	 *         and CLIENT_APPSTATE, or CLIENT_ALL to request all available clients.
 	 */
-	protected void setRequestedClients( int requestedClients, String... additionalScopes )
+	protected void setRequestedClients( int requestedClients )
 	{
 		mRequestedClients = requestedClients;
-		mAdditionalScopes = additionalScopes;
+	}
+
+	public GameHelper getGameHelper()
+	{
+		if( m_gameHelper == null )
+		{
+			m_gameHelper = new GameHelper( this, mRequestedClients );
+			m_gameHelper.enableDebugLog( mDebugLog );
+		}
+		return m_gameHelper;
 	}
 
 	@Override
 	protected void onCreate( Bundle b )
 	{
 		super.onCreate( b );
-		mHelper = new GameHelper( this );
-		if( mDebugLog )
+		if( m_gameHelper == null )
 		{
-			mHelper.enableDebugLog( mDebugLog, mDebugTag );
+			getGameHelper();
 		}
-		mHelper.setup( this, mRequestedClients, mAdditionalScopes );
+		m_gameHelper.setup( this );
 	}
 
 	@Override
 	protected void onStart()
 	{
 		super.onStart();
-		mHelper.onStart( this );
+		m_gameHelper.onStart( this );
 	}
 
 	@Override
 	protected void onStop()
 	{
 		super.onStop();
-		mHelper.onStop();
+		m_gameHelper.onStop();
 	}
 
 	@Override
 	protected void onActivityResult( int request, int response, Intent data )
 	{
 		super.onActivityResult( request, response, data );
-		mHelper.onActivityResult( request, response, data );
+		m_gameHelper.onActivityResult( request, response, data );
 	}
 
-	protected GamesClient getGamesClient()
+	protected GoogleApiClient getApiClient()
 	{
-		return mHelper.getGamesClient();
-	}
-
-	protected AppStateClient getAppStateClient()
-	{
-		return mHelper.getAppStateClient();
-	}
-
-	protected PlusClient getPlusClient()
-	{
-		return mHelper.getPlusClient();
+		return m_gameHelper.getApiClient();
 	}
 
 	protected boolean isSignedIn()
 	{
-		return mHelper.isSignedIn();
+		return m_gameHelper.isSignedIn();
 	}
 
 	protected void beginUserInitiatedSignIn()
 	{
-		mHelper.beginUserInitiatedSignIn();
+		m_gameHelper.beginUserInitiatedSignIn();
 	}
 
-	protected void signOut()
-	{
-		mHelper.signOut();
+	protected void signOut() {
+		m_gameHelper.signOut();
 	}
 
-	protected void showAlert( String title, String message )
-	{
-		mHelper.showAlert( title, message );
+	protected void showAlert(String message) {
+		m_gameHelper.makeSimpleDialog(message).show();
 	}
 
-	protected void showAlert( String message )
-	{
-		mHelper.showAlert( message );
+	protected void showAlert(String title, String message) {
+		m_gameHelper.makeSimpleDialog(title, message).show();
 	}
 
-	protected void enableDebugLog( boolean enabled, String tag )
-	{
+	protected void enableDebugLog(boolean enabled) {
 		mDebugLog = true;
-		mDebugTag = tag;
-		if( mHelper != null )
-		{
-			mHelper.enableDebugLog( enabled, tag );
+		if ( m_gameHelper != null) {
+			m_gameHelper.enableDebugLog(enabled);
 		}
 	}
 
-	protected String getInvitationId()
-	{
-		return mHelper.getInvitationId();
+	@Deprecated
+	protected void enableDebugLog(boolean enabled, String tag) {
+		Log.w( TAG, "BaseGameActivity.enabledDebugLog(bool,String) is " +
+		            "deprecated. Use enableDebugLog(boolean)" );
+		enableDebugLog(enabled);
 	}
 
-	protected void reconnectClients( int whichClients )
-	{
-		mHelper.reconnectClients( whichClients );
+	protected String getInvitationId() {
+		return m_gameHelper.getInvitationId();
 	}
 
-	protected String getScopes()
-	{
-		return mHelper.getScopes();
+	protected void reconnectClient() {
+		m_gameHelper.reconnectClient();
 	}
 
-	protected String[] getScopesArray()
-	{
-		return mHelper.getScopesArray();
+	protected boolean hasSignInError() {
+		return m_gameHelper.hasSignInError();
 	}
 
-	protected boolean hasSignInError()
-	{
-		return mHelper.hasSignInError();
-	}
-
-	protected GameHelper.SignInFailureReason getSignInError()
-	{
-		return mHelper.getSignInError();
+	protected GameHelper.SignInFailureReason getSignInError() {
+		return m_gameHelper.getSignInError();
 	}
 }

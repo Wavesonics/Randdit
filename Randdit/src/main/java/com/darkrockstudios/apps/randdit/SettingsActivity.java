@@ -33,8 +33,8 @@ public class SettingsActivity extends BaseGameActivity implements SharedPreferen
 	{
 		super.onCreate( savedInstanceState );
 
-		getActionBar().setDisplayHomeAsUpEnabled( true );
-		getActionBar().setHomeButtonEnabled( true );
+		getSupportActionBar().setDisplayHomeAsUpEnabled( true );
+		getSupportActionBar().setHomeButtonEnabled( true );
 
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( this );
 		m_isPro = settings.getBoolean( Preferences.KEY_IS_PRO, false );

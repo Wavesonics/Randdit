@@ -3,7 +3,7 @@ package com.darkrockstudios.apps.randdit;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,9 +24,9 @@ public abstract class NavDrawerActivity extends BillingActivity implements Adapt
 
 	private class DrawerToggle extends ActionBarDrawerToggle
 	{
-		public DrawerToggle( final Activity activity, final DrawerLayout drawerLayout, final int drawerImageRes, final int openDrawerContentDescRes, final int closeDrawerContentDescRes )
+		public DrawerToggle( final Activity activity, final DrawerLayout drawerLayout, final int openDrawerContentDescRes, final int closeDrawerContentDescRes )
 		{
-			super( activity, drawerLayout, drawerImageRes, openDrawerContentDescRes, closeDrawerContentDescRes );
+			super( activity, drawerLayout, openDrawerContentDescRes, closeDrawerContentDescRes );
 		}
 
 		public void onDrawerClosed( final View view )
@@ -88,11 +88,11 @@ public abstract class NavDrawerActivity extends BillingActivity implements Adapt
 		m_drawerLayout = (DrawerLayout) findViewById( R.id.drawer_layout );
 
 		m_drawerToggle =
-				new DrawerToggle( this, m_drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close );
+				new DrawerToggle( this, m_drawerLayout, R.string.drawer_open, R.string.drawer_close );
 		m_drawerLayout.setDrawerListener( m_drawerToggle );
 
-		getActionBar().setDisplayHomeAsUpEnabled( true );
-		getActionBar().setHomeButtonEnabled( true );
+		getSupportActionBar().setDisplayHomeAsUpEnabled( true );
+		getSupportActionBar().setHomeButtonEnabled( true );
 
 		m_navDrawerView = (ListView) findViewById( R.id.left_drawer );
 		m_navDrawerAdapter = new NavDrawerAdapter( this );
@@ -103,7 +103,7 @@ public abstract class NavDrawerActivity extends BillingActivity implements Adapt
 	public void clearTitle()
 	{
 		String appName = getString( R.string.app_name );
-		getActionBar().setTitle( appName );
+		getSupportActionBar().setTitle( appName );
 	}
 
 	public abstract void setTitle();

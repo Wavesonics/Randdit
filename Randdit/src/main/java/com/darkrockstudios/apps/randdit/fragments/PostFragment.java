@@ -123,8 +123,6 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 
 		m_imageHandler = new UriImageHandler();
 
-		Analytics.trackScreen( getActivity(), PostFragment.class.getSimpleName(), m_isPro );
-
 		Activity activity = getActivity();
 		if( activity != null )
 		{
@@ -266,7 +264,6 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 
 		// Fetch and store ShareActionProvider
 		m_shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider( item );
-		;
 
 		Intent shareIntent = createShareIntent( m_post );
 		if( shareIntent != null )
@@ -288,7 +285,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 			{
 				if( activity != null && isAdded() )
 				{
-					Analytics.trackFullscreen( activity, m_category, m_isPro );
+					Analytics.trackFullscreen( m_category, m_isPro );
 
 					if( IS_API_19_OR_LATER )
 					{
@@ -311,7 +308,7 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 					intent.setData( uri );
 					activity.startService( intent );
 
-					Analytics.trackDownload( activity, m_category, m_isPro );
+					Analytics.trackDownload( m_category, m_isPro );
 				}
 				handled = true;
 			}
@@ -328,11 +325,11 @@ public class PostFragment extends Fragment implements View.OnClickListener, Next
 						intent.putExtra( DownloadService.EXTRA_SET_WALLPAPER, true );
 						activity.startService( intent );
 
-						Analytics.trackWallpaper( activity, m_category, m_isPro );
+						Analytics.trackWallpaper( m_category, m_isPro );
 					}
 					else if( m_purchaseScreenProvider != null )
 					{
-						Analytics.trackProClick( getActivity(), "set_wallpaper" );
+						Analytics.trackProClick( "set_wallpaper" );
 
 						m_purchaseScreenProvider.showPurchaseScreen();
 					}

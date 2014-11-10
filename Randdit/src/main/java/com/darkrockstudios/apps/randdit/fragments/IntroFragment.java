@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.darkrockstudios.apps.randdit.R;
-import com.darkrockstudios.apps.randdit.misc.Analytics;
 import com.darkrockstudios.apps.randdit.misc.NextButtonEnabler;
 
 /**
@@ -42,8 +41,6 @@ public class IntroFragment extends Fragment implements NextButtonEnabler
 		{
 			m_isPro = args.getBoolean( ARG_PRO );
 		}
-
-		Analytics.trackScreen( getActivity(), IntroFragment.class.getSimpleName(), m_isPro );
 	}
 
 	@Override
