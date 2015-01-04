@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.14.1'
+        classpath 'com.android.tools.build:gradle:1.0.0'
     }
 }
 apply plugin: 'com.android.application'
@@ -19,15 +19,15 @@ dependencies {
     compile 'com.android.support:support-annotations:21.0.0'
     compile 'com.android.support:mediarouter-v7:21.0.0'
     compile 'com.android.support:gridlayout-v7:21.0.0'
-    compile 'com.android.support:appcompat-v7:21.0.0'
+    compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:support-v13:21.0.0'
-    compile 'com.google.android.gms:play-services:6.1.71'
+    compile 'com.google.android.gms:play-services:6.5.87'
     compile 'com.google.code.gson:gson:2.3'
     compile 'com.github.chrisbanes.photoview:library:1.2.2'
     compile('de.keyboardsurfer.android.widget:crouton:1.8.5@aar') {
         exclude group: 'com.google.android', module: 'support-v4'
     }
-    compile 'pl.droidsonroids.gif:android-gif-drawable:1.0.12'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.1'
     compile 'com.google.sample.castcompanionlibrary:CastCompanionLibrary-android:1.10@aar'
 
     compile files('libs/volley.jar')
@@ -35,7 +35,7 @@ dependencies {
 
 android {
     compileSdkVersion 21
-    buildToolsVersion '21.1.1'
+    buildToolsVersion '21.1.2'
 
     defaultConfig {
         minSdkVersion 15

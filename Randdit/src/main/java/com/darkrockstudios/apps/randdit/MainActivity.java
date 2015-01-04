@@ -99,6 +99,8 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 
 	private boolean m_isActive;
 
+	private MenuItem m_loadingItem;
+
 	@Override
 	public void showPurchaseScreen()
 	{
@@ -226,6 +228,14 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	{
 		getMenuInflater().inflate( R.menu.main, menu );
 
+		m_loadingItem = menu.findItem( R.id.menu_item_loading );
+		if( m_loadingItem != null )
+		{
+			m_loadingItem.setEnabled( false );
+			m_loadingItem.setActionView( R.layout.menu_item_loading );
+			m_loadingItem.expandActionView();
+		}
+
 		if( BuildConfig.DEBUG )
 		{
 			getDataCastManager( this ).addMediaRouterButton( menu, R.id.media_route_menu_item );
@@ -267,6 +277,10 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 				fragment.show( getFragmentManager(), ABOUT_FRAGMENT_TAG );
 
 				handled = true;
+			}
+			else if( id == R.id.menu_item_loading )
+			{
+				return true;
 			}
 			else
 			{
@@ -341,9 +355,13 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 	public void setSupportProgressBarIndeterminateVisibility( boolean visible )
 	{
 		// TODO: Dirty hack for 5.0 devices for now
-		if( !OsUtils.atLeastL() )
+		if( !OsUtils.atLeastLollipop() )
 		{
 			super.setSupportProgressBarIndeterminateVisibility( visible );
+		}
+		else if( m_loadingItem != null )
+		{
+			m_loadingItem.setVisible( visible );
 		}
 	}
 

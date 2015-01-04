@@ -9,6 +9,7 @@
         <!-- Set AppCompat’s color theming attrs -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
     </style>
 
     <style name="RandditActionBar" parent="android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">

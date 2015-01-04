@@ -7,8 +7,8 @@ import android.os.Build;
  */
 public class OsUtils
 {
-	public static boolean atLeastL()
+	public static boolean atLeastLollipop()
 	{
-		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.L;
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
 	}
 }
