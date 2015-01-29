@@ -835,7 +835,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			}
 			finally
 			{
-				setProgressBarIndeterminateVisibility( false );
+				setSupportProgressBarIndeterminateVisibility( false );
 				setNextImageButtonEnabled( true );
 				if( m_posts.size() > 0 )
 				{
@@ -856,7 +856,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 
 			Crouton.makeText( MainActivity.this, R.string.toast_post_request_error, Style.ALERT ).show();
 
-			setProgressBarIndeterminateVisibility( false );
+			setSupportProgressBarIndeterminateVisibility( false );
 			setNextImageButtonEnabled( true );
 		}
 	}
@@ -878,7 +878,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 
 			Crouton.makeText( MainActivity.this, R.string.toast_categories_failure, Style.ALERT ).show();
 
-			setProgressBarIndeterminateVisibility( false );
+			setSupportProgressBarIndeterminateVisibility( false );
 			setNextImageButtonEnabled( true );
 		}
 
@@ -893,7 +893,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			m_categories = categories;
 			m_navDrawerAdapter.setCategories( m_categories );
 
-			setProgressBarIndeterminateVisibility( false );
+			setSupportProgressBarIndeterminateVisibility( false );
 			setNextImageButtonEnabled( true );
 
 			Crouton.makeText( MainActivity.this, R.string.toast_categories_success, Style.INFO ).show();

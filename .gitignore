@@ -28,6 +28,8 @@ proguard/
 *.iws
 .idea/
 
+gradle.properties
+
 # OS generated files #
 ######################
 .DS_Store

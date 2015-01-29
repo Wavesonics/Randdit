@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v4.widget.DrawerLayout
+<com.darkrockstudios.apps.randdit.misc.HackyDrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
@@ -21,4 +21,4 @@
         android:choiceMode="singleChoice"
         android:divider="@drawable/nav_drawer_divider"
         android:background="@color/nav_drawer_background"/>
-</android.support.v4.widget.DrawerLayout>
+</com.darkrockstudios.apps.randdit.misc.HackyDrawerLayout>
