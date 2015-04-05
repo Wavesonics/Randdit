@@ -177,6 +177,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 		final String url = "http://randdit.com/actions/get_default_categories.php";
 		CategoriesHandler responseHandler = new CategoriesHandler( showPostOnUpdate );
 		JsonObjectRequest jsObjRequest = new JsonObjectRequest( url, null, responseHandler, responseHandler );
+		jsObjRequest.setRetryPolicy( new CustomRetryPolicy() );
 
 		RequestQueue requestQueue = RandditApplication.getRequestQueue();
 		requestQueue.add( jsObjRequest );
@@ -379,9 +380,11 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			setNextImageButtonEnabled( false );
 
 			final String url = "http://randdit.com/" + NavDrawerAdapter.getId( m_currentCategory ) + "/" + postId + "/?api";
+			Log.d( TAG, "Requestion: " + url );
 			RandditPostHandler responseHandler = new RandditPostHandler();
 			JsonObjectRequest jsObjRequest =
 					new JsonObjectRequest( url, null, responseHandler, responseHandler );
+			jsObjRequest.setRetryPolicy( new CustomRetryPolicy() );
 
 			RequestQueue requestQueue = RandditApplication.getRequestQueue();
 			requestQueue.add( jsObjRequest );
@@ -399,6 +402,7 @@ public class MainActivity extends NavDrawerActivity implements BillingActivity.P
 			RandditPostHandler responseHandler = new RandditPostHandler();
 			JsonObjectRequest jsObjRequest =
 					new JsonObjectRequest( url, null, responseHandler, responseHandler );
+			jsObjRequest.setRetryPolicy( new CustomRetryPolicy() );
 
 			RequestQueue requestQueue = RandditApplication.getRequestQueue();
 			requestQueue.add( jsObjRequest );
